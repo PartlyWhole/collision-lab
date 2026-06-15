@@ -805,8 +805,8 @@ while True:
       frame();
     }
 
-    function initBuilder(c) { return initBuilder2(c); }
-    function initBuilderDEAD(c) {
+    function initBuilder(c) { return initBuilderImpl(c); }
+    function initBuilderImpl(c) {
       const ctx = c.getContext("2d"); const sec = c.closest("[data-section]");
       const L = 44, Bm = 50, T = 14, Rr = 14;
       const A = { x: 110, y: 66, w: 152, h: 120 }; const B = { x: 256, y: 158, w: 124, h: 96 };
@@ -966,6 +966,55 @@ while True:
     DEMOS["circle-anatomy"] = initCircleAnatomy;
     DEMOS["builder"] = initBuilder;
 
+    // ---- inline live runner: ONE shared playground iframe, embedded under the active section ----
+    // Moving an iframe in the DOM reloads it, so a single element relocates to whichever
+    // section is active — that keeps exactly one Pyodide instance alive at a time.
+    let liveWrap = null, liveKey = null;
+    function ensureLiveWrap() {
+      if (liveWrap) return liveWrap;
+      const wrap = document.createElement("div");
+      wrap.style.cssText = "margin-top:16px; border:2px solid #2f6a44; background:#0a0c16; box-shadow:6px 6px 0 rgba(0,0,0,.45);";
+      const bar = document.createElement("div");
+      bar.style.cssText = "display:flex; align-items:center; gap:10px; background:#11210f; border-bottom:2px solid #2f6a44; padding:8px 12px; flex-wrap:wrap;";
+      const lbl = document.createElement("span");
+      lbl.style.cssText = "font-family:'Press Start 2P',monospace; font-size:8.5px; color:#9be88f; letter-spacing:.5px;";
+      lbl.textContent = "▶ LIVE · PYGAME PLAYGROUND";
+      const note = document.createElement("span");
+      note.style.cssText = "font-size:11px; color:#6a7290;";
+      note.textContent = "first run loads Python (~15MB, then cached)";
+      const tab = document.createElement("a");
+      tab.target = "_blank"; tab.rel = "noopener";
+      tab.style.cssText = "margin-left:auto; font-size:11px; color:#9be88f; text-decoration:none; border:1px solid #2f6a44; padding:4px 8px;";
+      tab.textContent = "↗ new tab";
+      const close = document.createElement("button");
+      close.style.cssText = "font-family:'Press Start 2P',monospace; font-size:8px; background:#1a1010; color:#ff8f8f; border:1px solid #5a2f2f; padding:6px 8px; cursor:pointer;";
+      close.textContent = "✕ CLOSE";
+      close.onclick = () => hideLive();
+      bar.append(lbl, note, tab, close);
+      const frame = document.createElement("iframe");
+      frame.title = "pygame playground";
+      frame.setAttribute("allow", "clipboard-write; fullscreen");
+      frame.style.cssText = "width:100%; height:560px; border:0; display:block; background:#14151a;";
+      wrap.append(bar, frame);
+      wrap._frame = frame; wrap._tab = tab;
+      liveWrap = wrap;
+      return wrap;
+    }
+    function hideLive() {
+      if (!liveWrap) return;
+      if (liveWrap._frame) liveWrap._frame.src = "about:blank";   // tear down Pyodide/audio
+      if (liveWrap.parentNode) liveWrap.parentNode.removeChild(liveWrap);
+      liveKey = null;
+    }
+    function showLive(key, url, anchorEl) {
+      const wrap = ensureLiveWrap();
+      anchorEl.parentNode.insertBefore(wrap, anchorEl.nextSibling);  // relocating reloads → fresh boot
+      wrap._tab.href = url;
+      wrap._frame.src = url;                                          // #code= auto-loads + auto-runs
+      liveKey = key;
+      wrap.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
     // ---- scan: idempotently wire any new demos/code/buttons as the template streams in ----
     function scan() {
       document.querySelectorAll("canvas[data-demo]").forEach((c) => {
@@ -985,9 +1034,14 @@ while True:
         if (btn.dataset.ready) return; btn.dataset.ready = "1";
         btn.addEventListener("click", () => {
           const code = CODE[btn.dataset.run]; if (!code) return;
+          const key = btn.dataset.run;
+          if (liveKey === key) { hideLive(); return; }   // same section → toggle closed
           const base = (self.props && self.props.playgroundUrl) || DEFAULT_URL;
-          window.open(base + "#code=" + b64url(code), "_blank");
-          const o = btn.textContent; btn.textContent = "✓ OPENED";
+          const url = base + "#code=" + b64url(code);
+          const sec = btn.closest("[data-section]");
+          const anchor = sec.querySelector("div[style*='grid-template-columns']") || sec;
+          showLive(key, url, anchor);
+          const o = btn.textContent; btn.textContent = "▶ RUNNING";
           setTimeout(() => { btn.textContent = o; }, 1400);
         });
         btn.addEventListener("mouseenter", () => { btn.style.transform = "translate(-1px,-1px)"; btn.style.boxShadow = "3px 3px 0 rgba(0,0,0,.5)"; });
