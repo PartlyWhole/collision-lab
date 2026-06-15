@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  @keyframes crtflick { 0%,100%{opacity:.05} 50%{opacity:.10} }
+  @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:.15} }
+  html,body { margin:0; }
+  body { background:#07080f; }
+  ::selection { background:#6ee7a0; color:#07080f; }
+</style>
+</helmet>
+<div style="min-height:100vh; background:radial-gradient(900px 500px at 50% -8%, #131a2e 0%, #0a0c16 55%, #07080f 100%); color:#d8dae5; font-family:'JetBrains Mono',ui-monospace,monospace; padding:38px 18px 90px; position:relative; overflow:hidden;">
+
+  <div style="max-width:1140px; margin:0 auto; position:relative; z-index:2;">
+
+    <!-- ===== HERO ===== -->
+    <header style="border:3px solid #6ee7a0; background:linear-gradient(180deg,#10131f,#0c0e18); box-shadow:10px 10px 0 rgba(0,0,0,.55), 0 0 34px -8px #6ee7a0; padding:30px 26px 26px; position:relative; margin-bottom:40px;">
+      <div style="position:absolute; top:-3px; right:18px; transform:translateY(-50%); background:#6ee7a0; color:#07080f; font-family:'Press Start 2P',monospace; font-size:9px; padding:6px 10px; letter-spacing:.5px;">PYGAME · v2.x</div>
+      <div style="font-family:'Press Start 2P',monospace; font-size:30px; line-height:1.25; color:#eaf6ef; text-shadow:3px 3px 0 #1f7a4d, 6px 6px 0 rgba(0,0,0,.4);">COLLISION&nbsp;LAB</div>
+      <p style="margin:18px 0 0; max-width:680px; font-size:14.5px; line-height:1.7; color:#aab0c4;">Six ways objects know they've touched — the actual <span style="color:#6ee7a0;">pygame</span> calls that power every platformer, shmup, and brick-breaker. Each panel is a live demo you can <b style="color:#eaf6ef;">drag and hover</b>, paired with the real, runnable program.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; font-family:'Press Start 2P',monospace; font-size:8.5px;">
+        <span style="background:#0d1322; border:2px solid #2a3350; color:#8a93ad; padding:8px 11px;">DRAG THE SHAPES</span>
+        <span style="background:#0d1322; border:2px solid #2a3350; color:#8a93ad; padding:8px 11px;">WATCH THE READOUT</span>
+        <span style="background:#11210f; border:2px solid #2f6a44; color:#9be88f; padding:8px 11px;">▶ RUN IT FOR REAL</span>
+      </div>
+    </header>
+
+    <div style="display:flex; align-items:center; gap:14px; margin:0 0 26px;">
+      <span style="font-family:'Press Start 2P',monospace; font-size:12px; color:#8fb8ff;">LESSON</span>
+      <span style="flex:1; height:2px; background:repeating-linear-gradient(90deg,#2a3350 0 8px,transparent 8px 14px);"></span>
+      <span style="font-size:12px; color:#6a7290;">first — what even <i>is</i> a shape?</span>
+    </div>
+
+    <!-- A1: RECTANGLE ANATOMY -->
+    <section data-section="anat-rect" style="--a:#8fb8ff; border:3px solid var(--a); background:#0e1320; box-shadow:8px 8px 0 rgba(0,0,0,.5), 0 0 24px -10px var(--a); margin-bottom:34px;">
+      <div style="display:flex; align-items:center; gap:14px; background:var(--a); color:#07080f; padding:11px 16px;">
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px;">A1</span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px;">MEET THE RECTANGLE</span>
+        <code style="margin-left:auto; background:rgba(7,8,15,.78); color:var(--a); font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:5px 9px; white-space:nowrap; flex-shrink:0;">Rect(x, y, w, h)</code>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 18px; font-size:14px; line-height:1.7; color:#aab0c4;">A pygame rectangle is just <b style="color:#eaf6ef;">four numbers</b>: <code style="color:#8fb8ff;">x, y</code> — the top-left corner — plus <code style="color:#9be88f;">width</code> and <code style="color:#ff8fb8;">height</code>. Those four <b style="color:#eaf6ef;">define</b> it. Every other member you'll ever use (<code style="color:var(--a);">right</code>, <code style="color:var(--a);">bottom</code>, <code style="color:var(--a);">center</code>…) pygame just computes from them. Drag the box to change x, y — drag the corner ◰ to change width, height.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:18px; align-items:start;">
+          <div>
+            <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="rect-anatomy" width="520" height="380" style="width:100%; height:auto; display:block;"></canvas></div>
+            <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:#6a7290; margin-top:9px; letter-spacing:.5px;">DRAG TO MOVE · DRAG THE CORNER TO RESIZE</div>
+          </div>
+          <div style="background:#0a0e18; border:2px solid #1d2333; box-shadow:5px 5px 0 rgba(0,0,0,.4);">
+            <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2333; padding:8px 12px;">
+              <span style="font-family:'Press Start 2P',monospace; font-size:8.5px; color:var(--a);">LIVE MEMBERS</span>
+              <span style="margin-left:auto; font-size:11px; color:#6a7290;">updates as you drag</span>
+            </div>
+            <div data-inspect="rect" style="padding:12px 14px; font-family:'JetBrains Mono',monospace; font-size:13px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- A2: CIRCLE ANATOMY -->
+    <section data-section="anat-circle" style="--a:#ff8fb8; border:3px solid var(--a); background:#0e1320; box-shadow:8px 8px 0 rgba(0,0,0,.5), 0 0 24px -10px var(--a); margin-bottom:34px;">
+      <div style="display:flex; align-items:center; gap:14px; background:var(--a); color:#07080f; padding:11px 16px;">
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px;">A2</span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px;">MEET THE CIRCLE</span>
+        <code style="margin-left:auto; background:rgba(7,8,15,.78); color:#0e1322; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:5px 9px; white-space:nowrap; flex-shrink:0;">center + radius</code>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 18px; font-size:14px; line-height:1.7; color:#aab0c4;">A circle is even simpler: a <b style="color:#eaf6ef;">center</b> <code style="color:#8fb8ff;">(x, y)</code> and a <b style="color:#eaf6ef;">radius</b> <code style="color:#ff8fb8;">r</code>. Three numbers, no <code style="color:var(--a);">Rect</code> at all — <code style="color:var(--a);">pygame.draw.circle</code> works straight from center + radius. Drag to move the center; drag the handle to change r.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:18px; align-items:start;">
+          <div>
+            <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="circle-anatomy" width="520" height="380" style="width:100%; height:auto; display:block;"></canvas></div>
+            <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:#6a7290; margin-top:9px; letter-spacing:.5px;">DRAG TO MOVE · DRAG THE HANDLE TO RESIZE r</div>
+          </div>
+          <div style="background:#0a0e18; border:2px solid #1d2333; box-shadow:5px 5px 0 rgba(0,0,0,.4);">
+            <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2333; padding:8px 12px;">
+              <span style="font-family:'Press Start 2P',monospace; font-size:8.5px; color:var(--a);">LIVE MEMBERS</span>
+              <span style="margin-left:auto; font-size:11px; color:#6a7290;">updates as you drag</span>
+            </div>
+            <div data-inspect="circle" style="padding:12px 14px; font-family:'JetBrains Mono',monospace; font-size:13px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- A3: GUIDED BUILDER -->
+    <section data-section="builder" style="--a:#ffd166; border:3px solid var(--a); background:#0e1320; box-shadow:8px 8px 0 rgba(0,0,0,.5), 0 0 24px -10px var(--a); margin-bottom:34px;">
+      <div style="display:flex; align-items:center; gap:14px; background:var(--a); color:#07080f; padding:11px 16px;">
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px;">A3</span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px;">BUILD colliderect() YOURSELF</span>
+        <code style="margin-left:auto; background:rgba(7,8,15,.78); color:#0e1322; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:5px 9px; white-space:nowrap; flex-shrink:0;">step by step</code>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 18px; font-size:14px; line-height:1.7; color:#aab0c4;">Now the payoff. You'll derive the rectangle-overlap test <b style="color:#eaf6ef;">one decision at a time</b> — choosing each condition, testing it live against the picture — then read the finished line <b style="color:#eaf6ef;">character by character</b>.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:18px; align-items:start;">
+          <div>
+            <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="builder" width="540" height="420" style="width:100%; height:auto; display:block;"></canvas></div>
+            <div style="margin-top:10px; background:#0c0f1a; border-left:3px solid var(--a); padding:11px 12px; font-size:13px;"><span data-blamp style="font-family:'JetBrains Mono',monospace;"></span></div>
+          </div>
+          <div style="background:#0a0e18; border:2px solid #1d2333; box-shadow:5px 5px 0 rgba(0,0,0,.4); display:flex; flex-direction:column;">
+            <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2333; padding:8px 12px;">
+              <span style="font-family:'Press Start 2P',monospace; font-size:8.5px; color:var(--a);">GUIDED DERIVATION</span>
+            </div>
+            <div style="padding:14px; display:flex; flex-direction:column; gap:12px;">
+              <div data-bstep style="font-size:13.5px; line-height:1.65; color:#cdd3e6; min-height:62px;"></div>
+              <div data-bopts></div>
+              <div data-bfeed style="font-size:12.5px; line-height:1.6; min-height:18px;"></div>
+              <button data-bnext style="align-self:flex-start; font-family:'Press Start 2P',monospace; font-size:9px; background:var(--a); color:#07080f; border:none; padding:10px 13px; cursor:pointer; box-shadow:2px 2px 0 rgba(0,0,0,.5); display:none;"></button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:18px; background:#0a0c16; border:2px solid #1d2233; box-shadow:5px 5px 0 rgba(0,0,0,.4);">
+          <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2233; padding:8px 12px;">
+            <span style="width:9px;height:9px;background:#ff6e6e;"></span><span style="width:9px;height:9px;background:#ffd166;"></span><span style="width:9px;height:9px;background:#6ee7a0;"></span>
+            <span style="margin-left:6px; font-size:11px; color:#6a7290;">your_condition.py</span>
+          </div>
+          <pre data-bcond style="margin:0; padding:14px; font-family:'JetBrains Mono',monospace; font-size:13.5px; line-height:1.7; color:#e6ebf7; white-space:pre-wrap;"></pre>
+        </div>
+        <div data-btok-wrap style="margin-top:16px; background:#0a0e18; border:2px solid #1d2333; border-left:4px solid var(--a); padding:14px 16px; display:none;">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:var(--a); letter-spacing:1px; margin-bottom:12px;">◢ READ IT CHARACTER BY CHARACTER</div>
+          <div data-btokens></div>
+        </div>
+      </div>
+    </section>
+
+    <div style="display:flex; align-items:center; gap:14px; margin:46px 0 28px;">
+      <span style="font-family:'Press Start 2P',monospace; font-size:12px; color:#6ee7a0;">QUICK REFERENCE</span>
+      <span style="flex:1; height:2px; background:repeating-linear-gradient(90deg,#2a3350 0 8px,transparent 8px 14px);"></span>
+      <span style="font-size:12px; color:#6a7290;">the six pygame collision calls</span>
+    </div>
+
+    <!-- ===== SECTIONS GET APPENDED ABOVE THIS SENTINEL ===== -->
+    <section data-section="aabb" style="--a:#6ee7a0; border:3px solid var(--a); background:#10131f; box-shadow:8px 8px 0 rgba(0,0,0,.5), 0 0 24px -10px var(--a); margin-bottom:34px;">
+      <div style="display:flex; align-items:center; gap:14px; background:var(--a); color:#07080f; padding:11px 16px;">
+        <span style="font-family:'Press Start 2P',monospace; font-size:18px;">01</span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px;">RECT vs RECT — AABB</span>
+        <code style="margin-left:auto; background:rgba(7,8,15,.78); color:var(--a); font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:5px 9px; white-space:nowrap; flex-shrink:0;">.colliderect()</code>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 18px; font-size:14px; line-height:1.7; color:#aab0c4;">The workhorse. Two axis-aligned boxes overlap when their X-ranges overlap <b style="color:#eaf6ef;">and</b> their Y-ranges overlap — four comparisons, no square roots. <code style="color:var(--a);">pygame.Rect</code> bakes it into one call. Cheap enough to run on thousands of objects per frame.</p>
+        <div style="margin:-2px 0 18px; background:#0a0e18; border:2px solid #1c2233; border-left:4px solid var(--a); padding:14px 16px 16px;">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:var(--a); letter-spacing:1px; margin-bottom:12px;">◢ THE MATH</div>
+          <div style="font-size:13px; color:#aab0c4; line-height:1.6; margin-bottom:12px;">Two boxes touch only when their ranges overlap on <b style="color:#eaf6ef;">both</b> axes at once:</div>
+          <div style="display:grid; gap:8px;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;"><span style="font-family:'Press Start 2P',monospace; font-size:8px; padding:5px 7px; background:var(--a); color:#07080f;">X</span><code style="font-family:'JetBrains Mono',monospace; font-size:13.5px; color:#e6ebf7; white-space:nowrap;">A.left &lt; B.right <b style="color:#ff6ec7;">and</b> A.right &gt; B.left</code></div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;"><span style="font-family:'Press Start 2P',monospace; font-size:8px; padding:5px 7px; background:var(--a); color:#07080f;">Y</span><code style="font-family:'JetBrains Mono',monospace; font-size:13.5px; color:#e6ebf7; white-space:nowrap;">A.top &lt; B.bottom <b style="color:#ff6ec7;">and</b> A.bottom &gt; B.top</code></div>
+          </div>
+          <div style="font-size:12.5px; color:#9aa2bb; line-height:1.6; margin-top:12px;"><span style="color:var(--a);">in plain words →</span> if a box is fully left, right, above, or below the other, they miss. If none of those is true, all four checks pass and it's a hit.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; align-items:start;">
+          <div>
+            <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="aabb" width="480" height="360" style="width:100%; height:auto; display:block; cursor:none;"></canvas></div>
+            <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:#6a7290; margin-top:9px; letter-spacing:.5px;">MOVE THE MOUSE — THE GREEN BOX FOLLOWS</div>
+            <div data-status style="margin-top:10px; background:#0c0f1a; border-left:3px solid var(--a); padding:10px 12px; font-size:13.5px; min-height:20px;"></div>
+          </div>
+          <div style="background:#0a0c16; border:2px solid #1d2233; box-shadow:5px 5px 0 rgba(0,0,0,.4);">
+            <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2233; padding:8px 12px;">
+              <span style="width:9px;height:9px;background:#ff6e6e;"></span><span style="width:9px;height:9px;background:#ffd166;"></span><span style="width:9px;height:9px;background:var(--a);"></span>
+              <span style="margin-left:6px; font-size:11px; color:#6a7290;">collide_aabb.py</span>
+              <button data-run="aabb" style="margin-left:auto; font-family:'Press Start 2P',monospace; font-size:8.5px; background:var(--a); color:#07080f; border:none; padding:7px 10px; cursor:pointer; box-shadow:2px 2px 0 rgba(0,0,0,.5);">▶ RUN LIVE</button>
+            </div>
+            <pre data-code="aabb" style="margin:0; padding:14px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; color:#cdd3e6; overflow-x:auto; white-space:pre;"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section data-section="point" style="--a:#5ad1e8; border:3px solid var(--a); background:#10131f; box-shadow:8px 8px 0 rgba(0,0,0,.5), 0 0 24px -10px var(--a); margin-bottom:34px;">
+      <div style="display:flex; align-items:center; gap:14px; background:var(--a); color:#07080f; padding:11px 16px;">
+        <span style="font-family:'Press Start 2P',monospace; font-size:18px;">02</span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px;">POINT vs RECT</span>
+        <code style="margin-left:auto; background:rgba(7,8,15,.78); color:var(--a); font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:5px 9px; white-space:nowrap; flex-shrink:0;">.collidepoint()</code>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 18px; font-size:14px; line-height:1.7; color:#aab0c4;">A single point — the mouse, a bullet tip, a tap — against one rect. This is how buttons, hitscan weapons, and "did I click that tile?" work. Two comparisons per axis; the cheapest test there is.</p>
+        <div style="margin:-2px 0 18px; background:#0a0e18; border:2px solid #1c2233; border-left:4px solid var(--a); padding:14px 16px 16px;">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:var(--a); letter-spacing:1px; margin-bottom:12px;">◢ THE MATH</div>
+          <div style="font-size:13px; color:#aab0c4; line-height:1.6; margin-bottom:12px;">The point is inside when its <b style="color:#eaf6ef;">x</b> sits between the sides <b style="color:#eaf6ef;">and</b> its <b style="color:#eaf6ef;">y</b> sits between top and bottom:</div>
+          <div style="display:grid; gap:8px;">
+            <code style="display:block; background:#070a12; border:1px solid #1a2030; padding:9px 12px; font-family:'JetBrains Mono',monospace; font-size:14px; color:#e6ebf7;">box.left &nbsp;≤ <b style="color:#ffd166;">x</b> ≤ box.right</code>
+            <code style="display:block; background:#070a12; border:1px solid #1a2030; padding:9px 12px; font-family:'JetBrains Mono',monospace; font-size:14px; color:#e6ebf7;">box.top &nbsp;&nbsp;≤ <b style="color:#ffd166;">y</b> ≤ box.bottom</code>
+          </div>
+          <div style="font-size:12.5px; color:#9aa2bb; line-height:1.6; margin-top:12px;"><span style="color:var(--a);">in plain words →</span> two "is it between?" checks. Both true at the same time → the point is in the box.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; align-items:start;">
+          <div>
+            <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="point" width="480" height="360" style="width:100%; height:auto; display:block; cursor:none;"></canvas></div>
+            <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:#6a7290; margin-top:9px; letter-spacing:.5px;">HOVER IN AND OUT OF THE BOX</div>
+            <div data-status style="margin-top:10px; background:#0c0f1a; border-left:3px solid var(--a); padding:10px 12px; font-size:13.5px; min-height:20px;"></div>
+          </div>
+          <div style="background:#0a0c16; border:2px solid #1d2233; box-shadow:5px 5px 0 rgba(0,0,0,.4);">
+            <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2233; padding:8px 12px;">
+              <span style="width:9px;height:9px;background:#ff6e6e;"></span><span style="width:9px;height:9px;background:#ffd166;"></span><span style="width:9px;height:9px;background:var(--a);"></span>
+              <span style="margin-left:6px; font-size:11px; color:#6a7290;">collide_point.py</span>
+              <button data-run="point" style="margin-left:auto; font-family:'Press Start 2P',monospace; font-size:8.5px; background:var(--a); color:#07080f; border:none; padding:7px 10px; cursor:pointer; box-shadow:2px 2px 0 rgba(0,0,0,.5);">▶ RUN LIVE</button>
+            </div>
+            <pre data-code="point" style="margin:0; padding:14px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; color:#cdd3e6; overflow-x:auto; white-space:pre;"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-section="circle" style="--a:#ff6ec7; border:3px solid var(--a); background:#10131f; box-shadow:8px 8px 0 rgba(0,0,0,.5), 0 0 24px -10px var(--a); margin-bottom:34px;">
+      <div style="display:flex; align-items:center; gap:14px; background:var(--a); color:#07080f; padding:11px 16px;">
+        <span style="font-family:'Press Start 2P',monospace; font-size:18px;">03</span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px;">CIRCLE — DISTANCE</span>
+        <code style="margin-left:auto; background:rgba(7,8,15,.78); color:var(--a); font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:5px 9px; white-space:nowrap; flex-shrink:0;">.distance_to()</code>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 18px; font-size:14px; line-height:1.7; color:#aab0c4;">Rects are boxy; lots of things are round. Two circles touch the moment the gap between their centers drops below the sum of their radii. No <code style="color:var(--a);">Rect</code> needed — just <code style="color:var(--a);">Vector2</code> math. (Tip: compare squared distances to skip the square root.)</p>
+        <div style="margin:-2px 0 18px; background:#0a0e18; border:2px solid #1c2233; border-left:4px solid var(--a); padding:14px 16px 16px;">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:var(--a); letter-spacing:1px; margin-bottom:12px;">◢ THE MATH</div>
+          <div style="font-size:13px; color:#aab0c4; line-height:1.6; margin-bottom:12px;">Measure the straight-line gap between the two centers — that's just Pythagoras:</div>
+          <div style="display:grid; gap:8px;">
+            <code style="display:block; background:#070a12; border:1px solid #1a2030; padding:9px 12px; font-family:'JetBrains Mono',monospace; font-size:14px; color:#e6ebf7;">dx = bx − ax &nbsp;&nbsp; dy = by − ay</code>
+            <code style="display:block; background:#070a12; border:1px solid #1a2030; padding:9px 12px; font-family:'JetBrains Mono',monospace; font-size:14px; color:#e6ebf7;">gap = √( dx² + dy² )</code>
+            <code style="display:block; background:#0f0a12; border:1px solid var(--a); padding:9px 12px; font-family:'JetBrains Mono',monospace; font-size:14px; color:#ffe1f3;">touch when &nbsp;gap &lt; ra + rb</code>
+          </div>
+          <div style="font-size:12.5px; color:#9aa2bb; line-height:1.6; margin-top:12px;"><span style="color:var(--a);">in plain words →</span> the circles overlap once the distance between centers is smaller than their two radii added together. Square roots are slow, so games compare <code style="color:#ffd166;">dx² + dy² &lt; (ra+rb)²</code> instead.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; align-items:start;">
+          <div>
+            <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="circle" width="480" height="360" style="width:100%; height:auto; display:block; cursor:none;"></canvas></div>
+            <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:#6a7290; margin-top:9px; letter-spacing:.5px;">DRAG THE PINK CIRCLE TOWARD THE GREY ONE</div>
+            <div data-status style="margin-top:10px; background:#0c0f1a; border-left:3px solid var(--a); padding:10px 12px; font-size:13.5px; min-height:20px;"></div>
+          </div>
+          <div style="background:#0a0c16; border:2px solid #1d2233; box-shadow:5px 5px 0 rgba(0,0,0,.4);">
+            <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2233; padding:8px 12px;">
+              <span style="width:9px;height:9px;background:#ff6e6e;"></span><span style="width:9px;height:9px;background:#ffd166;"></span><span style="width:9px;height:9px;background:var(--a);"></span>
+              <span style="margin-left:6px; font-size:11px; color:#6a7290;">collide_circle.py</span>
+              <button data-run="circle" style="margin-left:auto; font-family:'Press Start 2P',monospace; font-size:8.5px; background:var(--a); color:#07080f; border:none; padding:7px 10px; cursor:pointer; box-shadow:2px 2px 0 rgba(0,0,0,.5);">▶ RUN LIVE</button>
+            </div>
+            <pre data-code="circle" style="margin:0; padding:14px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; color:#cdd3e6; overflow-x:auto; white-space:pre;"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-section="mask" style="--a:#ffd166; border:3px solid var(--a); background:#10131f; box-shadow:8px 8px 0 rgba(0,0,0,.5), 0 0 24px -10px var(--a); margin-bottom:34px;">
+      <div style="display:flex; align-items:center; gap:14px; background:var(--a); color:#07080f; padding:11px 16px;">
+        <span style="font-family:'Press Start 2P',monospace; font-size:18px;">04</span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px;">PIXEL-PERFECT — MASK</span>
+        <code style="margin-left:auto; background:rgba(7,8,15,.78); color:#0e1322; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:5px 9px; white-space:nowrap; flex-shrink:0;">mask.overlap()</code>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 18px; font-size:14px; line-height:1.7; color:#aab0c4;">Sprites aren't rectangles. A <code style="color:var(--a);">Mask</code> ignores transparent pixels, so two angled or rounded shapes only "hit" when their <b style="color:#eaf6ef;">solid</b> pixels actually overlap. Watch the dashed bounding boxes collide long before the diamonds do.</p>
+        <div style="margin:-2px 0 18px; background:#0a0e18; border:2px solid #1c2233; border-left:4px solid var(--a); padding:14px 16px 16px;">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:var(--a); letter-spacing:1px; margin-bottom:12px;">◢ THE MATH</div>
+          <div style="font-size:13px; color:#aab0c4; line-height:1.6; margin-bottom:12px;">There's no single equation — it's a pixel-by-pixel <b style="color:#eaf6ef;">AND</b>, but only after the cheap box test passes:</div>
+          <div style="display:grid; gap:8px;">
+            <code style="display:block; background:#070a12; border:1px solid #1a2030; padding:9px 12px; font-family:'JetBrains Mono',monospace; font-size:13.5px; color:#e6ebf7;">for every shared pixel:&nbsp; solid_A <b style="color:#ff6ec7;">and</b> solid_B → HIT</code>
+            <code style="display:block; background:#0f0d07; border:1px solid var(--a); padding:9px 12px; font-family:'JetBrains Mono',monospace; font-size:13.5px; color:#fff3d6;">for these diamonds (|x|+|y| ≤ r): &nbsp;|dx|+|dy| &lt; rA + rB</code>
+          </div>
+          <div style="font-size:12.5px; color:#9aa2bb; line-height:1.6; margin-top:12px;"><span style="color:var(--a);">in plain words →</span> the fast rectangle check runs first; only if those boxes overlap does pygame scan the shared region for a pixel that is solid in <b style="color:#eaf6ef;">both</b> sprites.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; align-items:start;">
+          <div>
+            <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="mask" width="480" height="360" style="width:100%; height:auto; display:block; cursor:none;"></canvas></div>
+            <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:#6a7290; margin-top:9px; letter-spacing:.5px;">SLIDE THE GOLD DIAMOND PAST THE BLUE ONE</div>
+            <div data-status style="margin-top:10px; background:#0c0f1a; border-left:3px solid var(--a); padding:10px 12px; font-size:13px; min-height:20px;"></div>
+          </div>
+          <div style="background:#0a0c16; border:2px solid #1d2233; box-shadow:5px 5px 0 rgba(0,0,0,.4);">
+            <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2233; padding:8px 12px;">
+              <span style="width:9px;height:9px;background:#ff6e6e;"></span><span style="width:9px;height:9px;background:#ffd166;"></span><span style="width:9px;height:9px;background:#6ee7a0;"></span>
+              <span style="margin-left:6px; font-size:11px; color:#6a7290;">collide_mask.py</span>
+              <button data-run="mask" style="margin-left:auto; font-family:'Press Start 2P',monospace; font-size:8.5px; background:var(--a); color:#07080f; border:none; padding:7px 10px; cursor:pointer; box-shadow:2px 2px 0 rgba(0,0,0,.5);">▶ RUN LIVE</button>
+            </div>
+            <pre data-code="mask" style="margin:0; padding:14px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; color:#cdd3e6; overflow-x:auto; white-space:pre;"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-section="resolve" style="--a:#ff7a5c; border:3px solid var(--a); background:#10131f; box-shadow:8px 8px 0 rgba(0,0,0,.5), 0 0 24px -10px var(--a); margin-bottom:34px;">
+      <div style="display:flex; align-items:center; gap:14px; background:var(--a); color:#07080f; padding:11px 16px;">
+        <span style="font-family:'Press Start 2P',monospace; font-size:18px;">05</span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px;">RESOLUTION — BOUNCE</span>
+        <code style="margin-left:auto; background:rgba(7,8,15,.78); color:var(--a); font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:5px 9px; white-space:nowrap; flex-shrink:0;">snap + flip v</code>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 18px; font-size:14px; line-height:1.7; color:#aab0c4;">Detecting a hit is half the job — then you have to <b style="color:#eaf6ef;">respond</b>. The pattern: move, check, and if you've crossed a wall, snap the edge back to the boundary and flip that axis' velocity. Same idea resolves player-vs-wall and stops tunnelling.</p>
+        <div style="margin:-2px 0 18px; background:#0a0e18; border:2px solid #1c2233; border-left:4px solid var(--a); padding:14px 16px 16px;">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:var(--a); letter-spacing:1px; margin-bottom:12px;">◢ THE MATH</div>
+          <div style="font-size:13px; color:#aab0c4; line-height:1.6; margin-bottom:12px;">Once a hit is detected, two tiny corrections fix it:</div>
+          <div style="display:grid; gap:8px;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;"><span style="font-family:'Press Start 2P',monospace; font-size:8px; padding:5px 7px; background:var(--a); color:#07080f;">SNAP</span><code style="font-family:'JetBrains Mono',monospace; font-size:13.5px; color:#e6ebf7; white-space:nowrap;">ball.edge = wall</code><span style="font-size:12px; color:#7a8099;">— push it back to the boundary</span></div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;"><span style="font-family:'Press Start 2P',monospace; font-size:8px; padding:5px 7px; background:var(--a); color:#07080f;">FLIP</span><code style="font-family:'JetBrains Mono',monospace; font-size:13.5px; color:#e6ebf7; white-space:nowrap;">velocity = −velocity</code><span style="font-size:12px; color:#7a8099;">— reverse that one axis</span></div>
+          </div>
+          <div style="font-size:12.5px; color:#9aa2bb; line-height:1.6; margin-top:12px;"><span style="color:var(--a);">in plain words →</span> a bounce is literally multiplying the velocity by <b style="color:#eaf6ef;">−1</b> on the axis you hit. Snapping the edge back first stops the ball from sinking into the wall.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; align-items:start;">
+          <div>
+            <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="resolve" width="480" height="360" style="width:100%; height:auto; display:block;"></canvas></div>
+            <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:#6a7290; margin-top:9px; letter-spacing:.5px;">WATCH IT SNAP &amp; REVERSE AT EACH WALL</div>
+            <div data-status style="margin-top:10px; background:#0c0f1a; border-left:3px solid var(--a); padding:10px 12px; font-size:13px; min-height:20px;"></div>
+          </div>
+          <div style="background:#0a0c16; border:2px solid #1d2233; box-shadow:5px 5px 0 rgba(0,0,0,.4);">
+            <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2233; padding:8px 12px;">
+              <span style="width:9px;height:9px;background:#ff6e6e;"></span><span style="width:9px;height:9px;background:#ffd166;"></span><span style="width:9px;height:9px;background:#6ee7a0;"></span>
+              <span style="margin-left:6px; font-size:11px; color:#6a7290;">resolve_bounce.py</span>
+              <button data-run="resolve" style="margin-left:auto; font-family:'Press Start 2P',monospace; font-size:8.5px; background:var(--a); color:#07080f; border:none; padding:7px 10px; cursor:pointer; box-shadow:2px 2px 0 rgba(0,0,0,.5);">▶ RUN LIVE</button>
+            </div>
+            <pre data-code="resolve" style="margin:0; padding:14px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; color:#cdd3e6; overflow-x:auto; white-space:pre;"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-section="list" style="--a:#b48cff; border:3px solid var(--a); background:#10131f; box-shadow:8px 8px 0 rgba(0,0,0,.5), 0 0 24px -10px var(--a); margin-bottom:34px;">
+      <div style="display:flex; align-items:center; gap:14px; background:var(--a); color:#07080f; padding:11px 16px;">
+        <span style="font-family:'Press Start 2P',monospace; font-size:18px;">06</span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:13px; letter-spacing:.5px;">ONE vs MANY — LIST</span>
+        <code style="margin-left:auto; background:rgba(7,8,15,.78); color:var(--a); font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:5px 9px; white-space:nowrap; flex-shrink:0;">.collidelist()</code>
+      </div>
+      <div style="padding:20px;">
+        <p style="margin:0 0 18px; font-size:14px; line-height:1.7; color:#aab0c4;">Real games check one thing against many. <code style="color:var(--a);">collidelist</code> returns the index of the first box you touch (or <code style="color:var(--a);">-1</code>); <code style="color:var(--a);">collidelistall</code> returns every one. The sprite-group version, <code style="color:var(--a);">spritecollide</code>, is the same idea for whole <code style="color:var(--a);">Sprite</code> groups.</p>
+        <div style="margin:-2px 0 18px; background:#0a0e18; border:2px solid #1c2233; border-left:4px solid var(--a); padding:14px 16px 16px;">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:var(--a); letter-spacing:1px; margin-bottom:12px;">◢ THE MATH</div>
+          <div style="font-size:13px; color:#aab0c4; line-height:1.6; margin-bottom:12px;">No new math at all — it's the box test from <b style="color:#eaf6ef;">#01</b> run in a loop:</div>
+          <code style="display:block; background:#070a12; border:1px solid #1a2030; padding:11px 12px; font-family:'JetBrains Mono',monospace; font-size:13.5px; color:#e6ebf7; line-height:1.7; white-space:pre;">for i, box in enumerate(boxes):
+    if player.colliderect(box):
+        first hit is index i</code>
+          <div style="font-size:12.5px; color:#9aa2bb; line-height:1.6; margin-top:12px;"><span style="color:var(--a);">in plain words →</span> <code style="color:#ffd166;">collidelist</code> stops at the <b style="color:#eaf6ef;">first</b> box that passes and returns its index <code style="color:#ffd166;">i</code> (or <code style="color:#ffd166;">−1</code> if none). <code style="color:#ffd166;">collidelistall</code> keeps looping and returns every matching index.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; align-items:start;">
+          <div>
+            <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="list" width="480" height="360" style="width:100%; height:auto; display:block; cursor:none;"></canvas></div>
+            <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:#6a7290; margin-top:9px; letter-spacing:.5px;">SWEEP THE PURPLE BOX THROUGH THE FIELD</div>
+            <div data-status style="margin-top:10px; background:#0c0f1a; border-left:3px solid var(--a); padding:10px 12px; font-size:13px; min-height:20px;"></div>
+          </div>
+          <div style="background:#0a0c16; border:2px solid #1d2233; box-shadow:5px 5px 0 rgba(0,0,0,.4);">
+            <div style="display:flex; align-items:center; gap:8px; background:#0e1322; border-bottom:2px solid #1d2233; padding:8px 12px;">
+              <span style="width:9px;height:9px;background:#ff6e6e;"></span><span style="width:9px;height:9px;background:#ffd166;"></span><span style="width:9px;height:9px;background:#6ee7a0;"></span>
+              <span style="margin-left:6px; font-size:11px; color:#6a7290;">collide_list.py</span>
+              <button data-run="list" style="margin-left:auto; font-family:'Press Start 2P',monospace; font-size:8.5px; background:var(--a); color:#07080f; border:none; padding:7px 10px; cursor:pointer; box-shadow:2px 2px 0 rgba(0,0,0,.5);">▶ RUN LIVE</button>
+            </div>
+            <pre data-code="list" style="margin:0; padding:14px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; color:#cdd3e6; overflow-x:auto; white-space:pre;"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer style="border-top:2px dashed #2a3350; margin-top:10px; padding-top:22px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between;">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#6a7290;">Every snippet is a complete program — hit <span style="color:#9be88f;">▶ RUN LIVE</span> to open it in the pygame playground.</span>
+      <span style="font-family:'Press Start 2P',monospace; font-size:8px; color:#3f4762;">INSERT COIN</span>
+    </footer>
+
+    <div data-end></div>
+
+  </div>
+
+  <sc-if value="{{ scanlines }}" hint-placeholder-val="{{ true }}">
+    <div style="position:fixed; inset:0; z-index:50; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0px, rgba(0,0,0,.16) 1px, transparent 1px, transparent 3px); mix-blend-mode:multiply;"></div>
+  </sc-if>
+  <sc-if value="{{ crt }}" hint-placeholder-val="{{ true }}">
+    <div style="position:fixed; inset:0; z-index:51; pointer-events:none; background:#7ea0ff; opacity:.06; mix-blend-mode:overlay; animation:crtflick 5s steps(2) infinite;"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:920},&quot;playgroundUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://partlywhole.github.io/pygame-playground/&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;scanlines&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;crtFlicker&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      scanlines: this.props.scanlines !== false,
+      crt: this.props.crtFlicker !== false,
+    };
+  }
+
+  componentDidMount() {
+    const self = this;
+    const DEFAULT_URL = "https://partlywhole.github.io/pygame-playground/";
+
+    // ---- the real, runnable pygame programs ----
+    const CODE = {
+      aabb: `import pygame
+pygame.init()
+screen = pygame.display.set_mode((480, 360))
+clock = pygame.time.Clock()
+
+player = pygame.Rect(0, 0, 90, 70)        # the box you drag
+target = pygame.Rect(280, 150, 120, 120)  # the fixed box
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            raise SystemExit
+
+    player.center = pygame.mouse.get_pos()
+
+    hit = player.colliderect(target)      # <-- one call, True/False
+
+    screen.fill((10, 11, 20))
+    pygame.draw.rect(screen, (90, 209, 232), target, 0 if hit else 3)
+    col = (255, 110, 110) if hit else (110, 231, 160)
+    pygame.draw.rect(screen, col, player, 3)
+    pygame.display.flip()
+    clock.tick(60)`,
+
+      point: `import pygame
+pygame.init()
+screen = pygame.display.set_mode((480, 360))
+clock = pygame.time.Clock()
+
+box = pygame.Rect(150, 110, 180, 140)
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            raise SystemExit
+
+    point = pygame.mouse.get_pos()
+    inside = box.collidepoint(point)      # is this point in the rect?
+
+    screen.fill((10, 11, 20))
+    fill = 0 if inside else 3
+    pygame.draw.rect(screen, (90, 209, 232) if inside else (70, 80, 120), box, fill)
+    pygame.draw.circle(screen, (255, 209, 102), point, 7)
+    pygame.display.flip()
+    clock.tick(60)`,
+
+      circle: `import pygame
+pygame.init()
+screen = pygame.display.set_mode((480, 360))
+clock = pygame.time.Clock()
+
+a, ra = pygame.Vector2(180, 200), 52      # fixed circle
+rb = 40                                   # mouse circle
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            raise SystemExit
+
+    b = pygame.Vector2(pygame.mouse.get_pos())
+
+    dist = a.distance_to(b)               # gap between centers
+    hit = dist < ra + rb                  # touch when gap < sum of radii
+
+    screen.fill((10, 11, 20))
+    pygame.draw.line(screen, (90, 100, 140), a, b, 2)
+    pygame.draw.circle(screen, (120, 140, 180), a, ra, 3)
+    pygame.draw.circle(screen, (255, 110, 110) if hit else (255, 110, 199), b, rb, 3)
+    pygame.display.flip()
+    clock.tick(60)`,
+
+      mask: `import pygame
+pygame.init()
+screen = pygame.display.set_mode((480, 360))
+clock = pygame.time.Clock()
+
+def diamond(size, color):
+    s = pygame.Surface((size, size), pygame.SRCALPHA)
+    c = size // 2
+    pygame.draw.polygon(s, color, [(c, 0), (size, c), (c, size), (0, c)])
+    return s
+
+img_a = diamond(130, (90, 209, 232))
+img_b = diamond(130, (255, 209, 102))
+mask_a = pygame.mask.from_surface(img_a)  # solid pixels only
+mask_b = pygame.mask.from_surface(img_b)
+pos_a = (150, 115)
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            raise SystemExit
+
+    mx, my = pygame.mouse.get_pos()
+    pos_b = (mx - 65, my - 65)
+
+    rect_a = img_a.get_rect(topleft=pos_a)
+    rect_b = img_b.get_rect(topleft=pos_b)
+    rect_hit = rect_a.colliderect(rect_b)             # bounding boxes
+
+    offset = (pos_b[0] - pos_a[0], pos_b[1] - pos_a[1])
+    pixel_hit = mask_a.overlap(mask_b, offset) is not None  # real pixels
+
+    screen.fill((10, 11, 20))
+    screen.blit(img_a, pos_a)
+    screen.blit(img_b, pos_b)
+    pygame.display.flip()
+    clock.tick(60)`,
+
+      resolve: `import pygame
+pygame.init()
+W, H = 480, 360
+screen = pygame.display.set_mode((W, H))
+clock = pygame.time.Clock()
+
+ball = pygame.Rect(70, 70, 44, 44)
+vx, vy = 4, 3
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            raise SystemExit
+
+    ball.x += vx
+    ball.y += vy
+
+    # detect, then RESOLVE: snap back to the edge and flip velocity
+    if ball.left < 0:    ball.left = 0;     vx = -vx
+    if ball.right > W:   ball.right = W;    vx = -vx
+    if ball.top < 0:     ball.top = 0;      vy = -vy
+    if ball.bottom > H:  ball.bottom = H;   vy = -vy
+
+    screen.fill((10, 11, 20))
+    pygame.draw.rect(screen, (110, 231, 160), ball, border_radius=10)
+    pygame.display.flip()
+    clock.tick(60)`,
+
+      list: `import pygame, random
+pygame.init()
+screen = pygame.display.set_mode((480, 360))
+clock = pygame.time.Clock()
+
+boxes = [pygame.Rect(x, y, 60, 60) for x, y in
+         [(60,40),(300,55),(180,150),(360,205),(95,235),(250,255),(405,120)]]
+player = pygame.Rect(0, 0, 52, 52)
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            raise SystemExit
+
+    player.center = pygame.mouse.get_pos()
+
+    first = player.collidelist(boxes)        # index of first hit, or -1
+    hits = player.collidelistall(boxes)      # every overlapping index
+
+    screen.fill((10, 11, 20))
+    for i, b in enumerate(boxes):
+        on = i in hits
+        pygame.draw.rect(screen, (255,110,110) if on else (90,110,150), b, 0 if on else 3)
+    pygame.draw.rect(screen, (180, 140, 255), player, 3)
+    pygame.display.flip()
+    clock.tick(60)`,
+    };
+
+    // ---- helpers ----
+    const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const KW = /^(import|from|as|while|for|in|if|elif|else|def|return|True|False|None|not|and|or|raise|class|is)$/;
+    const METH = /^(colliderect|collidepoint|collidelist|collidelistall|overlap|distance_to|from_surface)$/;
+    function highlight(code) {
+      const re = /(#[^\n]*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(\b\d+\.?\d*\b)|([A-Za-z_]\w*)/g;
+      let out = "", last = 0, m;
+      while ((m = re.exec(code))) {
+        out += esc(code.slice(last, m.index));
+        last = re.lastIndex;
+        if (m[1]) out += `<span style="color:#5a6378;font-style:italic">${esc(m[1])}</span>`;
+        else if (m[2]) out += `<span style="color:#9be88f">${esc(m[2])}</span>`;
+        else if (m[3]) out += `<span style="color:#ff9d6c">${esc(m[3])}</span>`;
+        else {
+          const w = m[4];
+          if (KW.test(w)) out += `<span style="color:#ff6ec7">${esc(w)}</span>`;
+          else if (w === "pygame") out += `<span style="color:#5ad1e8">${esc(w)}</span>`;
+          else if (METH.test(w)) out += `<span style="color:#ffd166;font-weight:700">${esc(w)}</span>`;
+          else out += esc(w);
+        }
+      }
+      out += esc(code.slice(last));
+      return out;
+    }
+    const b64url = (s) =>
+      btoa(unescape(encodeURIComponent(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+    function statusHTML(label, hit) {
+      return `<span style="color:#7a8099">${label} → </span><span style="color:${hit ? "#ff6e6e" : "#6ee7a0"};font-weight:700">${hit ? "True" : "False"}</span>`;
+    }
+
+    function startLoop(canvas, step) {
+      const ctx = canvas.getContext("2d");
+      canvas._mx = canvas.width * 0.62;
+      canvas._my = canvas.height * 0.5;
+      canvas.addEventListener("mousemove", (e) => {
+        const r = canvas.getBoundingClientRect();
+        canvas._mx = (e.clientX - r.left) * (canvas.width / r.width);
+        canvas._my = (e.clientY - r.top) * (canvas.height / r.height);
+      });
+      const frame = () => { step(ctx, canvas._mx, canvas._my); canvas._raf = requestAnimationFrame(frame); };
+      frame();
+    }
+    function grid(ctx, w, h) {
+      ctx.fillStyle = "#0a0b14"; ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = "rgba(126,160,255,0.05)"; ctx.lineWidth = 1;
+      for (let x = 24; x < w; x += 24) { ctx.beginPath(); ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, h); ctx.stroke(); }
+      for (let y = 24; y < h; y += 24) { ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(w, y + .5); ctx.stroke(); }
+    }
+    function sr(ctx, r, col, lw) { ctx.lineWidth = lw || 3; ctx.strokeStyle = col; ctx.strokeRect(r.x + .5, r.y + .5, r.w, r.h); }
+    function fr(ctx, r, col) { ctx.fillStyle = col; ctx.fillRect(r.x, r.y, r.w, r.h); }
+    function aabb(p, q) { return p.x < q.x + q.w && p.x + p.w > q.x && p.y < q.y + q.h && p.y + p.h > q.y; }
+    function cursor(ctx, x, y, col) {
+      ctx.strokeStyle = col; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(x - 9, y); ctx.lineTo(x + 9, y); ctx.moveTo(x, y - 9); ctx.lineTo(x, y + 9); ctx.stroke();
+    }
+
+    // ---- demos ----
+    const DEMOS = {
+      aabb(c, st) {
+        const target = { x: 280, y: 130, w: 120, h: 120 };
+        startLoop(c, (ctx, mx, my) => {
+          const p = { x: mx - 45, y: my - 35, w: 90, h: 70 };
+          const hit = aabb(p, target);
+          grid(ctx, c.width, c.height);
+          if (hit) { ctx.fillStyle = "rgba(255,110,110,0.10)"; ctx.fillRect(0, 0, c.width, c.height); }
+          fr(ctx, target, hit ? "rgba(90,209,232,0.18)" : "rgba(90,209,232,0.06)");
+          sr(ctx, target, "#5ad1e8", 3);
+          sr(ctx, p, hit ? "#ff6e6e" : "#6ee7a0", 3);
+          ctx.font = "10px 'JetBrains Mono',monospace"; ctx.fillStyle = "#5ad1e8";
+          ctx.fillText("target", target.x + 4, target.y - 6);
+          if (st) st.innerHTML = statusHTML("player.colliderect(target)", hit);
+        });
+      },
+      point(c, st) {
+        const box = { x: 150, y: 100, w: 180, h: 140 };
+        startLoop(c, (ctx, mx, my) => {
+          const inside = mx > box.x && mx < box.x + box.w && my > box.y && my < box.y + box.h;
+          grid(ctx, c.width, c.height);
+          fr(ctx, box, inside ? "rgba(90,209,232,0.20)" : "rgba(90,110,160,0.06)");
+          sr(ctx, box, inside ? "#5ad1e8" : "#566", 3);
+          ctx.fillStyle = "#ffd166";
+          ctx.beginPath(); ctx.arc(mx, my, 7, 0, 7); ctx.fill();
+          cursor(ctx, mx, my, "rgba(255,209,102,0.5)");
+          if (st) st.innerHTML = statusHTML("box.collidepoint(pos)", inside);
+        });
+      },
+      circle(c, st) {
+        const a = { x: 180, y: 200 }, ra = 52, rb = 40;
+        startLoop(c, (ctx, mx, my) => {
+          const dx = mx - a.x, dy = my - a.y, d = Math.hypot(dx, dy), hit = d < ra + rb;
+          grid(ctx, c.width, c.height);
+          ctx.strokeStyle = hit ? "#ff6e6e" : "#5a6480"; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mx, my); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.lineWidth = 3; ctx.strokeStyle = "#7890c0";
+          ctx.beginPath(); ctx.arc(a.x, a.y, ra, 0, 7); ctx.stroke();
+          ctx.strokeStyle = hit ? "#ff6e6e" : "#ff6ec7";
+          ctx.beginPath(); ctx.arc(mx, my, rb, 0, 7); ctx.stroke();
+          ctx.font = "10px 'JetBrains Mono',monospace"; ctx.fillStyle = "#ffd166";
+          ctx.fillText(d.toFixed(0) + "px", (a.x + mx) / 2 + 6, (a.y + my) / 2 - 4);
+          if (st) st.innerHTML = `<span style="color:#7a8099">distance </span><span style="color:#ffd166;font-weight:700">${d.toFixed(0)}</span><span style="color:#7a8099"> &lt; r₁+r₂ (${ra + rb}) → </span><span style="color:${hit ? "#ff6e6e" : "#6ee7a0"};font-weight:700">${hit ? "True" : "False"}</span>`;
+        });
+      },
+      mask(c, st) {
+        const H = 65, ca = { x: 215, y: 180 };
+        function dia(ctx, cx, cy, h, col) {
+          ctx.beginPath(); ctx.moveTo(cx, cy - h); ctx.lineTo(cx + h, cy); ctx.lineTo(cx, cy + h); ctx.lineTo(cx - h, cy); ctx.closePath();
+          ctx.fillStyle = col; ctx.fill();
+        }
+        startLoop(c, (ctx, mx, my) => {
+          const cb = { x: mx, y: my };
+          const rectHit = Math.abs(ca.x - cb.x) < H * 2 && Math.abs(ca.y - cb.y) < H * 2;
+          const pixelHit = (Math.abs(ca.x - cb.x) + Math.abs(ca.y - cb.y)) < H * 2;
+          grid(ctx, c.width, c.height);
+          // bounding boxes
+          ctx.setLineDash([5, 4]); ctx.lineWidth = 1.5;
+          ctx.strokeStyle = rectHit ? "rgba(255,209,102,0.9)" : "rgba(120,130,160,0.5)";
+          ctx.strokeRect(ca.x - H, ca.y - H, H * 2, H * 2);
+          ctx.strokeRect(cb.x - H, cb.y - H, H * 2, H * 2);
+          ctx.setLineDash([]);
+          dia(ctx, ca.x, ca.y, H, "rgba(90,209,232,0.85)");
+          dia(ctx, cb.x, cb.y, H, pixelHit ? "rgba(255,110,110,0.9)" : "rgba(255,209,102,0.85)");
+          if (st) st.innerHTML =
+            `<div style="display:flex;justify-content:space-between"><span style="color:#7a8099">bounding rects</span><span style="color:${rectHit ? "#ffd166" : "#6ee7a0"};font-weight:700">${rectHit ? "HIT" : "clear"}</span></div>` +
+            `<div style="display:flex;justify-content:space-between;margin-top:4px"><span style="color:#7a8099">mask.overlap (pixels)</span><span style="color:${pixelHit ? "#ff6e6e" : "#6ee7a0"};font-weight:700">${pixelHit ? "HIT" : "clear"}</span></div>`;
+        });
+      },
+      resolve(c, st) {
+        const W = c.width, Hh = c.height, b = { x: 70, y: 70, w: 44, h: 44, vx: 4, vy: 3 };
+        let flash = 0, flashSide = "";
+        startLoop(c, (ctx) => {
+          b.x += b.vx; b.y += b.vy;
+          if (b.x < 0) { b.x = 0; b.vx = -b.vx; flash = 8; flashSide = "L"; }
+          if (b.x + b.w > W) { b.x = W - b.w; b.vx = -b.vx; flash = 8; flashSide = "R"; }
+          if (b.y < 0) { b.y = 0; b.vy = -b.vy; flash = 8; flashSide = "T"; }
+          if (b.y + b.h > Hh) { b.y = Hh - b.h; b.vy = -b.vy; flash = 8; flashSide = "B"; }
+          grid(ctx, W, Hh);
+          if (flash > 0) {
+            ctx.fillStyle = `rgba(255,209,102,${flash / 28})`;
+            if (flashSide === "L") ctx.fillRect(0, 0, 10, Hh);
+            if (flashSide === "R") ctx.fillRect(W - 10, 0, 10, Hh);
+            if (flashSide === "T") ctx.fillRect(0, 0, W, 10);
+            if (flashSide === "B") ctx.fillRect(0, Hh - 10, W, 10);
+            flash--;
+          }
+          ctx.fillStyle = "#6ee7a0";
+          const rad = 10; ctx.beginPath();
+          ctx.roundRect(b.x, b.y, b.w, b.h, rad); ctx.fill();
+          // velocity arrow
+          ctx.strokeStyle = "#0a0b14"; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(b.x + b.w / 2, b.y + b.h / 2);
+          ctx.lineTo(b.x + b.w / 2 + b.vx * 4, b.y + b.h / 2 + b.vy * 4); ctx.stroke();
+          if (st) st.innerHTML = `<span style="color:#7a8099">velocity </span><span style="color:#6ee7a0;font-weight:700">vx=${b.vx} vy=${b.vy}</span><span style="color:#7a8099"> · snap-back + flip at walls</span>`;
+        });
+      },
+      list(c, st) {
+        const boxes = [[60, 40], [300, 55], [180, 150], [360, 205], [95, 235], [250, 255], [405, 120]]
+          .map(([x, y]) => ({ x, y, w: 60, h: 60 }));
+        startLoop(c, (ctx, mx, my) => {
+          const p = { x: mx - 26, y: my - 26, w: 52, h: 52 };
+          const hits = []; let first = -1;
+          boxes.forEach((b, i) => { if (aabb(p, b)) { hits.push(i); if (first < 0) first = i; } });
+          grid(ctx, c.width, c.height);
+          boxes.forEach((b, i) => {
+            const on = hits.includes(i);
+            fr(ctx, b, on ? "rgba(255,110,110,0.85)" : "rgba(90,110,150,0.10)");
+            sr(ctx, b, on ? "#ff6e6e" : "#5a6c96", on ? 2 : 3);
+            ctx.font = "10px 'JetBrains Mono',monospace"; ctx.fillStyle = on ? "#07080f" : "#5a6c96";
+            ctx.fillText(i, b.x + 5, b.y + 14);
+          });
+          sr(ctx, p, "#b48cff", 3);
+          if (st) st.innerHTML = `<span style="color:#7a8099">collidelist → </span><span style="color:${first < 0 ? "#6ee7a0" : "#ff6e6e"};font-weight:700">${first}</span><span style="color:#7a8099"> · all → </span><span style="color:#b48cff;font-weight:700">[${hits.join(",")}]</span>`;
+        });
+      },
+    };
+
+    // ---- anatomy + guided-logic lesson ----
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    function relMouse(c, e) { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) * (c.width / r.width), (e.clientY - r.top) * (c.height / r.height)]; }
+    function dot(ctx, x, y, col, rr) { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, rr || 4.5, 0, 7); ctx.fill(); }
+    function dash(ctx, x1, y1, x2, y2, col) { ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = col; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore(); }
+    function tag(ctx, x, y, text, col, bg) { ctx.font = "bold 11px 'JetBrains Mono',monospace"; const w = ctx.measureText(text).width; ctx.fillStyle = bg || "rgba(7,8,15,0.82)"; ctx.fillRect(x - 3, y - 11, w + 6, 15); ctx.fillStyle = col; ctx.fillText(text, x, y); }
+    function dimH(ctx, x1, x2, y, col, text) { ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.moveTo(x1, y - 4); ctx.lineTo(x1, y + 4); ctx.moveTo(x2, y - 4); ctx.lineTo(x2, y + 4); ctx.stroke(); tag(ctx, (x1 + x2) / 2 - ctx.measureText(text).width / 2, y - 4, text, col); }
+    function dimV(ctx, y1, y2, x, col, text) { ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.moveTo(x - 4, y1); ctx.lineTo(x + 4, y1); ctx.moveTo(x - 4, y2); ctx.lineTo(x + 4, y2); ctx.stroke(); ctx.save(); ctx.translate(x - 5, (y1 + y2) / 2); ctx.rotate(-Math.PI / 2); tag(ctx, -ctx.measureText(text).width / 2, 0, text, col); ctx.restore(); }
+    const igrp = (t) => `<div style="font-family:'Press Start 2P',monospace;font-size:7.5px;letter-spacing:.5px;color:#6a7290;margin:10px 0 7px;">${t}</div>`;
+    const irow = (k, v, note, kc) => `<div style="display:flex;gap:8px;align-items:baseline;padding:3px 2px;border-bottom:1px solid #11151f;"><span style="flex:0 0 96px;color:${kc}">${k}</span><span style="flex:0 0 46px;text-align:right;color:#fff;font-weight:700">${v}</span><span style="color:#6a7290;font-size:11.5px">${note || ""}</span></div>`;
+
+    function initRectAnatomy(c) {
+      const ctx = c.getContext("2d"); const r = { x: 175, y: 120, w: 150, h: 110 }, HS = 16; let mode = null, ox = 0, oy = 0;
+      const inH = (mx, my) => mx >= r.x + r.w - HS && mx <= r.x + r.w + 5 && my >= r.y + r.h - HS && my <= r.y + r.h + 5;
+      const inR = (mx, my) => mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h;
+      c.addEventListener("mousedown", (e) => { const [mx, my] = relMouse(c, e); if (inH(mx, my)) mode = "resize"; else if (inR(mx, my)) { mode = "move"; ox = mx - r.x; oy = my - r.y; } e.preventDefault(); });
+      window.addEventListener("mousemove", (e) => { if (!mode) return; const [mx, my] = relMouse(c, e); if (mode === "move") { r.x = clamp(mx - ox, 42, c.width - r.w - 8); r.y = clamp(my - oy, 36, c.height - r.h - 8); } else { r.w = clamp(mx - r.x, 44, c.width - r.x - 8); r.h = clamp(my - r.y, 36, c.height - r.y - 8); } });
+      window.addEventListener("mouseup", () => { mode = null; });
+      c.addEventListener("mousemove", (e) => { const [mx, my] = relMouse(c, e); c.style.cursor = inH(mx, my) ? "nwse-resize" : (inR(mx, my) ? "move" : "default"); });
+      const insp = c.closest("[data-section]").querySelector('[data-inspect="rect"]');
+      function frame() {
+        grid(ctx, c.width, c.height);
+        tag(ctx, 8, 16, "(0,0)", "#6a7290");
+        dash(ctx, 0, r.y, r.x, r.y, "#8fb8ff"); tag(ctx, Math.max(4, r.x / 2 - 14), r.y - 5, "x=" + Math.round(r.x), "#8fb8ff");
+        dash(ctx, r.x, 0, r.x, r.y, "#ffd166"); tag(ctx, r.x + 5, Math.max(13, r.y / 2), "y=" + Math.round(r.y), "#ffd166");
+        ctx.fillStyle = "rgba(143,184,255,0.10)"; ctx.fillRect(r.x, r.y, r.w, r.h);
+        ctx.strokeStyle = "#8fb8ff"; ctx.lineWidth = 3; ctx.strokeRect(r.x + .5, r.y + .5, r.w, r.h);
+        dimH(ctx, r.x, r.x + r.w, r.y - 16, "#9be88f", "width=" + Math.round(r.w));
+        dimV(ctx, r.y, r.y + r.h, r.x - 16, "#ff8fb8", "height=" + Math.round(r.h));
+        dot(ctx, r.x, r.y, "#ffffff", 5); tag(ctx, r.x + 8, r.y - 8, "(x, y)", "#ffffff");
+        dot(ctx, r.x + r.w / 2, r.y + r.h / 2, "#ffd166", 4); tag(ctx, r.x + r.w / 2 + 7, r.y + r.h / 2 + 4, "center", "#ffd166");
+        ctx.fillStyle = mode === "resize" ? "#ffffff" : "#8fb8ff"; ctx.fillRect(r.x + r.w - HS, r.y + r.h - HS, HS, HS); ctx.strokeStyle = "#0a0b14"; ctx.lineWidth = 2; ctx.strokeRect(r.x + r.w - HS, r.y + r.h - HS, HS, HS);
+        if (insp) insp.innerHTML =
+          igrp("THESE 4 NUMBERS ARE THE RECT") +
+          irow("rect.x", Math.round(r.x), "left edge · across →", "#8fb8ff") +
+          irow("rect.y", Math.round(r.y), "top edge · down ↓", "#ffd166") +
+          irow("rect.width", Math.round(r.w), "", "#9be88f") +
+          irow("rect.height", Math.round(r.h), "", "#ff8fb8") +
+          igrp("PYGAME DERIVES THE REST") +
+          irow("rect.right", Math.round(r.x + r.w), "= x + width", "#cdd3e6") +
+          irow("rect.bottom", Math.round(r.y + r.h), "= y + height", "#cdd3e6") +
+          irow("rect.centerx", Math.round(r.x + r.w / 2), "= x + width//2", "#cdd3e6") +
+          irow("rect.centery", Math.round(r.y + r.h / 2), "= y + height//2", "#cdd3e6");
+        requestAnimationFrame(frame);
+      }
+      frame();
+    }
+
+    function initCircleAnatomy(c) {
+      const ctx = c.getContext("2d"); const o = { x: 255, y: 195, r: 78 }; let mode = null, ox = 0, oy = 0;
+      const hx = () => o.x + o.r, hy = () => o.y;
+      const nearH = (mx, my) => Math.hypot(mx - hx(), my - hy()) < 13;
+      const inO = (mx, my) => Math.hypot(mx - o.x, my - o.y) < o.r;
+      c.addEventListener("mousedown", (e) => { const [mx, my] = relMouse(c, e); if (nearH(mx, my)) mode = "resize"; else if (inO(mx, my)) { mode = "move"; ox = mx - o.x; oy = my - o.y; } e.preventDefault(); });
+      window.addEventListener("mousemove", (e) => { if (!mode) return; const [mx, my] = relMouse(c, e); if (mode === "move") { o.x = clamp(mx - ox, o.r + 34, c.width - o.r - 8); o.y = clamp(my - oy, o.r + 8, c.height - o.r - 8); } else { o.r = clamp(Math.round(Math.hypot(mx - o.x, my - o.y)), 24, Math.min(o.x - 34, c.width - o.x - 8, o.y - 8, c.height - o.y - 8)); } });
+      window.addEventListener("mouseup", () => { mode = null; });
+      c.addEventListener("mousemove", (e) => { const [mx, my] = relMouse(c, e); c.style.cursor = nearH(mx, my) ? "ew-resize" : (inO(mx, my) ? "move" : "default"); });
+      const insp = c.closest("[data-section]").querySelector('[data-inspect="circle"]');
+      function frame() {
+        grid(ctx, c.width, c.height);
+        tag(ctx, 8, 16, "(0,0)", "#6a7290");
+        ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = "rgba(120,140,180,0.5)"; ctx.lineWidth = 1.4; ctx.strokeRect(o.x - o.r, o.y - o.r, o.r * 2, o.r * 2); ctx.restore();
+        ctx.fillStyle = "rgba(255,143,184,0.10)"; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, 7); ctx.fill();
+        ctx.strokeStyle = "#ff8fb8"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, 7); ctx.stroke();
+        ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(hx(), hy()); ctx.stroke();
+        tag(ctx, (o.x + hx()) / 2 - 16, o.y - 6, "r=" + o.r, "#ffd166");
+        dot(ctx, o.x, o.y, "#ffffff", 5); tag(ctx, o.x + 8, o.y - 8, "(x, y)", "#ffffff");
+        ctx.fillStyle = mode === "resize" ? "#fff" : "#ff8fb8"; ctx.beginPath(); ctx.arc(hx(), hy(), 6, 0, 7); ctx.fill(); ctx.strokeStyle = "#0a0b14"; ctx.lineWidth = 2; ctx.stroke();
+        if (insp) insp.innerHTML =
+          igrp("THESE 3 NUMBERS ARE THE CIRCLE") +
+          irow("center x", Math.round(o.x), "across →", "#8fb8ff") +
+          irow("center y", Math.round(o.y), "down ↓", "#ffd166") +
+          irow("radius", Math.round(o.r), "", "#ff8fb8") +
+          igrp("DERIVED BOUNDING BOX") +
+          irow("left", Math.round(o.x - o.r), "= x - r", "#cdd3e6") +
+          irow("right", Math.round(o.x + o.r), "= x + r", "#cdd3e6") +
+          irow("top", Math.round(o.y - o.r), "= y - r", "#cdd3e6") +
+          irow("bottom", Math.round(o.y + o.r), "= y + r", "#cdd3e6") +
+          `<div style="margin-top:10px;padding:9px 10px;background:#070a12;border:1px solid #1a2030;font-size:12px;color:#cdd3e6;">a point is inside when&nbsp; <span style="color:#ffd166">(px−x)² + (py−y)² ≤ r²</span></div>`;
+        requestAnimationFrame(frame);
+      }
+      frame();
+    }
+
+    function initBuilder(c) { return initBuilder2(c); }
+    function initBuilderDEAD(c) {
+      const ctx = c.getContext("2d"); const sec = c.closest("[data-section]");
+      const L = 44, Bm = 50, T = 14, Rr = 14;
+      const A = { x: 110, y: 66, w: 152, h: 120 }; const B = { x: 256, y: 158, w: 124, h: 96 };
+      let mode = null, ox = 0, oy = 0;
+      const inB = (mx, my) => mx >= B.x && mx <= B.x + B.w && my >= B.y && my <= B.y + B.h;
+      c.addEventListener("mousedown", (e) => { const [mx, my] = relMouse(c, e); if (inB(mx, my)) { mode = "move"; ox = mx - B.x; oy = my - B.y; } e.preventDefault(); });
+      window.addEventListener("mousemove", (e) => { if (mode !== "move") return; const [mx, my] = relMouse(c, e); B.x = clamp(mx - ox, L + 4, c.width - Rr - B.w - 4); B.y = clamp(my - oy, T + 4, c.height - Bm - B.h - 4); });
+      window.addEventListener("mouseup", () => { mode = null; });
+      c.addEventListener("mousemove", (e) => { const [mx, my] = relMouse(c, e); c.style.cursor = inB(mx, my) ? "move" : "default"; });
+      const m = (r) => ({ left: r.x, right: r.x + r.w, top: r.y, bottom: r.y + r.h });
+      const truthX = () => m(A).left < m(B).right && m(A).right > m(B).left;
+      const truthY = () => m(A).top < m(B).bottom && m(A).bottom > m(B).top;
+      const OPTS = {
+        1: [{ h: "A.left < B.right and A.right > B.left", correct: true, test: () => m(A).left < m(B).right && m(A).right > m(B).left },
+            { h: "A.left < B.left and A.right < B.right", test: () => m(A).left < m(B).left && m(A).right < m(B).right },
+            { h: "A.right < B.left", test: () => m(A).right < m(B).left },
+            { h: "A.left > B.right or A.right < B.left", test: () => m(A).left > m(B).right || m(A).right < m(B).left }],
+        2: [{ h: "A.top < B.bottom and A.bottom > B.top", correct: true, test: () => m(A).top < m(B).bottom && m(A).bottom > m(B).top },
+            { h: "A.top < B.top and A.bottom < B.bottom", test: () => m(A).top < m(B).top && m(A).bottom < m(B).bottom },
+            { h: "A.bottom < B.top", test: () => m(A).bottom < m(B).top },
+            { h: "A.top > B.bottom or A.bottom < B.top", test: () => m(A).top > m(B).bottom || m(A).bottom < m(B).top }],
+        3: [{ h: "x_overlap and y_overlap", correct: true, test: () => truthX() && truthY() },
+            { h: "x_overlap or y_overlap", test: () => truthX() || truthY() },
+            { h: "not (x_overlap and y_overlap)", test: () => !(truthX() && truthY()) }],
+      };
+      const realTruth = { 1: truthX, 2: truthY, 3: () => truthX() && truthY(), 4: () => truthX() && truthY() };
+      const st = { step: 0, armed: null, revealed: false, explain: "" };
+      const el = (s) => sec.querySelector(s);
+      function updateCond() {
+        const cEl = el("[data-bcond]"); if (!cEl) return;
+        const X = 'A.left &lt; B.right <span style="color:#ff6ec7">and</span> A.right &gt; B.left';
+        const Y = 'A.top &lt; B.bottom <span style="color:#ff6ec7">and</span> A.bottom &gt; B.top';
+        const kIf = '<span style="color:#ff6ec7">if</span>', kAnd = '<span style="color:#ff6ec7">and</span>', kT = '<span style="color:#5ad1e8">True</span>';
+        if (st.step < 2) { cEl.innerHTML = '<span style="color:#6a7290"># your condition appears here as you build it…</span>'; return; }
+        if (st.step === 2) { cEl.innerHTML = `${kIf} ( ${X} ):\n    collision = ${kT}`; return; }
+        cEl.innerHTML = `${kIf} ( ${X}\n     ${kAnd} ${Y} ):\n    collision = ${kT}`;
+      }
+      function tokenBreakdown() {
+        const toks = [
+          ["A", "the first rectangle — a Rect object", "#fff"],
+          [".left", "A's left edge · the same number as A.x", "#8fb8ff"],
+          ["<", "“is less than” → sits further left", "#ffd166"],
+          ["B.right", "B's right edge · equals B.x + B.width", "#9be88f"],
+          ["and", "BOTH sides of this and must be True", "#ff6ec7"],
+          ["A.right", "A's right edge · equals A.x + A.width", "#8fb8ff"],
+          [">", "“is greater than” → sits further right", "#ffd166"],
+          ["B.left", "B's left edge · the same number as B.x", "#9be88f"],
+          ["and", "joins the x-test to the y-test — all four must hold", "#ff6ec7"],
+          ["A.top … B.top", "the y-axis pair: identical logic, swap left/right → top/bottom", "#6a7290"],
+        ];
+        return toks.map((t) => `<div style="display:flex;gap:14px;align-items:baseline;padding:6px 0;border-bottom:1px solid #11151f;"><code style="flex:0 0 120px;color:${t[2]};font-size:13px;font-weight:700">${t[0]}</code><span style="color:#aab0c4;font-size:12.5px;line-height:1.5">${t[1]}</span></div>`).join("");
+      }
+      function renderUI() {
+        const stepEl = el("[data-bstep]"), optsEl = el("[data-bopts]"), feedEl = el("[data-bfeed]"), nextEl = el("[data-bnext]");
+        st.armed = null; feedEl.innerHTML = "";
+        if (st.step === 0) {
+          stepEl.innerHTML = `<b style="color:#ffd166">Step 0 — the big idea.</b> A collision is just <b style="color:#fff">overlap</b>, and two boxes overlap only if their shadows overlap on the <b style="color:#5ad1e8">x-axis</b> AND the <b style="color:#9be88f">y-axis</b> at once. Drag <b style="color:#9be88f">B</b> and watch the two projection bars.`;
+          optsEl.innerHTML = ""; nextEl.style.display = ""; nextEl.textContent = "Start building →"; nextEl.onclick = () => { st.step = 1; st.revealed = false; st.explain = ""; renderUI(); };
+        } else if (st.step <= 3) {
+          const titles = { 1: "Step 1 — overlap on the X-axis", 2: "Step 2 — overlap on the Y-axis", 3: "Step 3 — combine them" };
+          const explainQ = {
+            1: 'In your own words — when do the two boxes overlap on the <b style="color:#5ad1e8">X-axis</b>? Think about A\'s left/right edges versus B\'s.',
+            2: 'Now say the <b style="color:#9be88f">Y-axis</b> overlap in words — same idea, swap left/right for top/bottom.',
+            3: 'You have <code style="color:#5ad1e8">x_overlap</code> and <code style="color:#9be88f">y_overlap</code>. In words, how do they combine into a real collision?',
+          };
+          stepEl.innerHTML = `<b style="color:#ffd166">${titles[st.step]}.</b> ` + (st.revealed
+            ? "Compare your wording with the choices below — drag B to test any of them."
+            : "Try it in words first. The answer choices unlock once you've written your explanation.");
+          optsEl.innerHTML = "";
+          if (!st.revealed) {
+            const q = document.createElement("div");
+            q.style.cssText = "font-size:13px;color:#9aa2bb;margin:0 0 9px;line-height:1.6;";
+            q.innerHTML = explainQ[st.step];
+            const ta = document.createElement("textarea");
+            ta.placeholder = "Type your reasoning… (no code needed — just the idea)";
+            ta.value = st.explain || "";
+            ta.style.cssText = "width:100%;box-sizing:border-box;min-height:76px;resize:vertical;background:#0c1018;border:2px solid #232a3d;color:#e6ebf7;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.55;padding:10px;outline:none;";
+            ta.addEventListener("focus", () => { ta.style.borderColor = "#ffd166"; });
+            ta.addEventListener("blur", () => { ta.style.borderColor = "#232a3d"; });
+            const rev = document.createElement("button");
+            rev.textContent = "Reveal the answer choices →";
+            rev.style.cssText = "margin-top:10px;font-family:'Press Start 2P',monospace;font-size:8.5px;background:var(--a);color:#07080f;border:none;padding:10px 12px;box-shadow:2px 2px 0 rgba(0,0,0,.5);";
+            const sync = () => { const ok = ta.value.trim().length >= 12; rev.disabled = !ok; rev.style.opacity = ok ? "1" : "0.4"; rev.style.cursor = ok ? "pointer" : "not-allowed"; };
+            ta.addEventListener("input", () => { st.explain = ta.value; sync(); });
+            rev.onclick = () => { if (ta.value.trim().length < 12) return; st.explain = ta.value; st.revealed = true; renderUI(); };
+            const hint = document.createElement("div");
+            hint.style.cssText = "font-size:11.5px;color:#6a7290;margin-top:8px;";
+            hint.textContent = "Write at least a sentence — then reveal the options to check yourself.";
+            optsEl.appendChild(q); optsEl.appendChild(ta); optsEl.appendChild(rev); optsEl.appendChild(hint);
+            sync();
+            nextEl.style.display = "none";
+          } else {
+            if (st.explain && st.explain.trim()) {
+              const quote = document.createElement("div");
+              quote.style.cssText = "background:#0c1018;border-left:3px solid #6a7290;padding:8px 11px;margin:0 0 12px;font-size:12px;color:#9aa2bb;font-style:italic;";
+              quote.textContent = "you said: “" + st.explain.trim() + "”";
+              optsEl.appendChild(quote);
+            }
+            const pickLbl = document.createElement("div");
+            pickLbl.style.cssText = "font-size:12.5px;color:#cdd3e6;margin:0 0 10px;";
+            pickLbl.textContent = "Now pick the line that matches your reasoning:";
+            optsEl.appendChild(pickLbl);
+            OPTS[st.step].forEach((o) => {
+              const b = document.createElement("button");
+              b.textContent = o.h;
+              b.style.cssText = "display:block;width:100%;text-align:left;margin:0 0 8px;padding:11px 12px;background:#0c1018;border:2px solid #232a3d;color:#cdd3e6;font-family:'JetBrains Mono',monospace;font-size:12.5px;cursor:pointer;";
+              b.onclick = () => {
+                st.armed = o;
+                [...optsEl.querySelectorAll("button")].forEach((ch) => { ch.style.borderColor = "#232a3d"; ch.style.background = "#0c1018"; });
+                b.style.borderColor = o.correct ? "#9be88f" : "#ff6e6e"; b.style.background = o.correct ? "rgba(110,231,160,0.08)" : "rgba(255,110,110,0.08)";
+                if (o.correct) { feedEl.innerHTML = `<span style="color:#9be88f">✓ That's it.</span> Drag B anywhere — your rule stays in lock-step with the picture. Lock it in.`; nextEl.style.display = ""; nextEl.textContent = "Lock it in →"; nextEl.onclick = () => { st.step++; st.revealed = false; st.explain = ""; renderUI(); }; }
+                else { feedEl.innerHTML = `<span style="color:#ff6e6e">✗ Not quite.</span> Drag B around — you'll hit a spot where this rule disagrees with the bars. Then try another.`; nextEl.style.display = "none"; }
+              };
+              optsEl.appendChild(b);
+            });
+            nextEl.style.display = "none";
+          }
+        } else {
+          stepEl.innerHTML = `<b style="color:#9be88f">Done — you just built <code style="color:#fff">A.colliderect(B)</code> from nothing.</b> Drag B: the lamp now runs your full four-part condition. This exact line is what pygame checks.`;
+          optsEl.innerHTML = ""; nextEl.style.display = "none";
+          const tb = el("[data-btokens]"); if (tb) { tb.innerHTML = tokenBreakdown(); tb.closest("[data-btok-wrap]").style.display = ""; }
+        }
+        updateCond();
+      }
+      function frame() {
+        grid(ctx, c.width, c.height);
+        ctx.fillStyle = "#0c1018"; ctx.fillRect(0, c.height - Bm, c.width, Bm); ctx.fillRect(0, 0, L, c.height);
+        ctx.strokeStyle = "#1a2030"; ctx.lineWidth = 1; ctx.strokeRect(.5, .5, L, c.height - 1); ctx.strokeRect(.5, c.height - Bm + .5, c.width - 1, Bm - 1);
+        tag(ctx, L + 6, c.height - Bm + 16, "x-axis ↓ shadows", "#5a6378");
+        ctx.save(); ctx.translate(15, c.height - Bm - 8); ctx.rotate(-Math.PI / 2); tag(ctx, 0, 0, "y-axis → shadows", "#5a6378"); ctx.restore();
+        const box = (r, col, fill, lab) => { ctx.fillStyle = fill; ctx.fillRect(r.x, r.y, r.w, r.h); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.strokeRect(r.x + .5, r.y + .5, r.w, r.h); tag(ctx, r.x + 5, r.y + 15, lab, col); };
+        box(A, "#5ad1e8", "rgba(90,209,232,0.10)", "A (fixed)");
+        box(B, "#9be88f", "rgba(155,232,143,0.12)", "B (drag me)");
+        const barY = c.height - Bm;
+        [["#5ad1e8", A], ["#9be88f", B]].forEach(([col, r]) => { dash(ctx, r.x, r.y + r.h, r.x, barY, col); dash(ctx, r.x + r.w, r.y + r.h, r.x + r.w, barY, col); });
+        ctx.fillStyle = "#5ad1e8"; ctx.fillRect(A.x, barY + 9, A.w, 7);
+        ctx.fillStyle = "#9be88f"; ctx.fillRect(B.x, barY + 22, B.w, 7);
+        const oxL = Math.max(A.x, B.x), oxR = Math.min(A.x + A.w, B.x + B.w);
+        if (oxR > oxL) { ctx.fillStyle = "rgba(255,209,102,0.9)"; ctx.fillRect(oxL, barY + 16, oxR - oxL, 6); }
+        [["#5ad1e8", A], ["#9be88f", B]].forEach(([col, r]) => { dash(ctx, r.x, r.y, L, r.y, col); dash(ctx, r.x, r.y + r.h, L, r.y + r.h, col); });
+        ctx.fillStyle = "#5ad1e8"; ctx.fillRect(L - 22, A.y, 7, A.h);
+        ctx.fillStyle = "#9be88f"; ctx.fillRect(L - 34, B.y, 7, B.h);
+        const oyT = Math.max(A.y, B.y), oyB = Math.min(A.y + A.h, B.y + B.h);
+        if (oyB > oyT) { ctx.fillStyle = "rgba(255,209,102,0.9)"; ctx.fillRect(L - 28, oyT, 6, oyB - oyT); }
+        const lamp = el("[data-blamp]");
+        if (lamp) {
+          if (st.step >= 1 && st.step <= 3 && st.armed) { const rule = !!st.armed.test(); const real = !!realTruth[st.step](); const ok = rule === real; lamp.innerHTML = `<span style="color:#7a8099">your rule:</span> <b style="color:${rule ? "#ff6e6e" : "#9be88f"}">${rule ? "HIT" : "clear"}</b><span style="color:#3f4762"> &nbsp;|&nbsp; </span><span style="color:#7a8099">the bars:</span> <b style="color:${real ? "#ff6e6e" : "#9be88f"}">${real ? "overlap" : "apart"}</b><span style="color:#3f4762"> &nbsp;|&nbsp; </span><b style="color:${ok ? "#9be88f" : "#ffd166"}">${ok ? "✓ agree" : "✗ DISAGREE"}</b>`; }
+          else if (st.step >= 4) { const real = !!realTruth[4](); lamp.innerHTML = `<span style="color:#7a8099">A.colliderect(B) →</span> <b style="color:${real ? "#ff6e6e" : "#9be88f"}">${real ? "True · overlap" : "False · apart"}</b>`; }
+          else { lamp.innerHTML = `<span style="color:#5ad1e8">x-overlap: ${truthX() ? "yes" : "no"}</span><span style="color:#3f4762"> &nbsp;·&nbsp; </span><span style="color:#9be88f">y-overlap: ${truthY() ? "yes" : "no"}</span>`; }
+        }
+        requestAnimationFrame(frame);
+      }
+      renderUI(); frame();
+    }
+
+    DEMOS["rect-anatomy"] = initRectAnatomy;
+    DEMOS["circle-anatomy"] = initCircleAnatomy;
+    DEMOS["builder"] = initBuilder;
+
+    // ---- scan: idempotently wire any new demos/code/buttons as the template streams in ----
+    function scan() {
+      document.querySelectorAll("canvas[data-demo]").forEach((c) => {
+        if (c.dataset.ready) return;
+        const fn = DEMOS[c.dataset.demo];
+        if (!fn) return;
+        c.dataset.ready = "1";
+        const sec = c.closest("[data-section]");
+        const st = sec ? sec.querySelector("[data-status]") : null;
+        fn(c, st);
+      });
+      document.querySelectorAll("pre[data-code]").forEach((p) => {
+        if (p.dataset.ready) return; p.dataset.ready = "1";
+        p.innerHTML = highlight(CODE[p.dataset.code] || "");
+      });
+      document.querySelectorAll("button[data-run]").forEach((btn) => {
+        if (btn.dataset.ready) return; btn.dataset.ready = "1";
+        btn.addEventListener("click", () => {
+          const code = CODE[btn.dataset.run]; if (!code) return;
+          const base = (self.props && self.props.playgroundUrl) || DEFAULT_URL;
+          window.open(base + "#code=" + b64url(code), "_blank");
+          const o = btn.textContent; btn.textContent = "✓ OPENED";
+          setTimeout(() => { btn.textContent = o; }, 1400);
+        });
+        btn.addEventListener("mouseenter", () => { btn.style.transform = "translate(-1px,-1px)"; btn.style.boxShadow = "3px 3px 0 rgba(0,0,0,.5)"; });
+        btn.addEventListener("mouseleave", () => { btn.style.transform = ""; btn.style.boxShadow = "2px 2px 0 rgba(0,0,0,.5)"; });
+      });
+    }
+    scan();
+    this._scanIv = setInterval(scan, 250);
+    setTimeout(() => clearInterval(this._scanIv), 8000);
+  }
+}
+</script>
+</body>
+</html>
