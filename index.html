@@ -881,38 +881,57 @@ while True:
     DEMOS["circle-anatomy"] = initCircleAnatomy;
     DEMOS["builder"] = initBuilder;
 
-    // ---- inline live runner: ONE shared backend iframe that REPLACES a section's
-    // static visualization (the left [data-viz] cell) in place, leaving the code on
-    // the right. "Run live" swaps the static canvas for the live editor+canvas, and
-    // toggles back to show the visualization.
-    let liveFrame = null, liveKey = null, liveBtn = null, liveHiddenViz = null;
+    // ---- inline live runner: ONE shared backend iframe that REPLACES a whole
+    // reference row. "Run live" hides BOTH the static visualization ([data-viz])
+    // and the static code panel, and drops in a full-width runner whose internal
+    // layout is live canvas (left) + editable code (right). A SHOW CODE control
+    // in the runner's top bar toggles back to the static viz + code.
+    let liveFrame = null, liveKey = null, liveBtn = null, liveWrap = null, liveHiddenViz = null, liveHiddenCode = null;
     function ensureFrame() {
       if (liveFrame) return liveFrame;
       const f = document.createElement("iframe");
       f.title = "pygame runner";
       f.setAttribute("allow", "clipboard-write; fullscreen");
-      f.style.cssText = "width:100%; height:540px; border:2px solid #262a3a; display:block; background:#0a0c16; box-sizing:border-box;";
+      f.style.cssText = "width:100%; height:560px; border:2px solid #1d2233; border-top:0; display:block; background:#0a0c16; box-sizing:border-box;";
       liveFrame = f;
       return f;
     }
-    function stopLive() {
-      if (liveFrame) {
-        liveFrame.src = "about:blank";                 // tear down Pyodide/audio
-        if (liveFrame.parentNode) liveFrame.parentNode.removeChild(liveFrame);
-      }
-      if (liveHiddenViz) liveHiddenViz.style.display = "";   // restore the static visualization
-      if (liveBtn) liveBtn.textContent = "▶ RUN LIVE";
-      liveKey = null; liveBtn = null; liveHiddenViz = null;
+    function makeWrap() {
+      const w = document.createElement("div");
+      w.style.cssText = "grid-column:1 / -1;";          // span the full reference row
+      const bar = document.createElement("div");
+      bar.style.cssText = "display:flex; align-items:center; gap:10px; background:#0e1322; border:2px solid #1d2233; padding:7px 12px;";
+      const label = document.createElement("span");
+      label.style.cssText = "font-family:'Press Start 2P',monospace; font-size:8.5px; color:#9be88f; letter-spacing:.5px;";
+      label.textContent = "▶ LIVE · canvas + editable code";
+      const close = document.createElement("button");
+      close.textContent = "✕ SHOW CODE";
+      close.style.cssText = "margin-left:auto; font-family:'Press Start 2P',monospace; font-size:8px; background:#1a1010; color:#ff8f8f; border:1px solid #5a2f2f; padding:7px 9px; cursor:pointer; box-shadow:2px 2px 0 rgba(0,0,0,.5);";
+      close.onclick = () => stopLive();
+      bar.append(label, close);
+      w.append(bar, ensureFrame());
+      return w;
     }
-    function startLive(key, url, viz, btn) {
+    function stopLive() {
+      if (liveFrame) liveFrame.src = "about:blank";    // tear down Pyodide/audio
+      if (liveWrap && liveWrap.parentNode) liveWrap.parentNode.removeChild(liveWrap);
+      if (liveHiddenViz) liveHiddenViz.style.display = "";    // restore the static visualization…
+      if (liveHiddenCode) liveHiddenCode.style.display = "";  // …and the static code panel
+      if (liveBtn) liveBtn.textContent = "▶ RUN LIVE";
+      liveKey = null; liveBtn = null; liveWrap = null; liveHiddenViz = null; liveHiddenCode = null;
+    }
+    function startLive(key, url, sec, btn) {
       if (liveKey) stopLive();                         // only one live runner at a time
-      const f = ensureFrame();
-      viz.style.display = "none";                      // hide the static visualization…
-      viz.parentNode.insertBefore(f, viz);             // …and take its place (the left cell)
-      f.src = url;                                     // #code= auto-loads + auto-runs
-      liveKey = key; liveBtn = btn; liveHiddenViz = viz;
-      btn.textContent = "✕ SHOW CODE";
-      f.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      const grid = sec.querySelector("div[style*='grid-template-columns']");
+      const viz = sec.querySelector("[data-viz]");
+      const codeCell = sec.querySelector("pre[data-code]").parentNode;   // the right column wrapper
+      viz.style.display = "none";
+      codeCell.style.display = "none";
+      liveWrap = makeWrap();
+      grid.appendChild(liveWrap);
+      liveFrame.src = url;                             // #code= auto-loads + auto-runs
+      liveKey = key; liveBtn = btn; liveHiddenViz = viz; liveHiddenCode = codeCell;
+      liveWrap.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
     // ---- scan: idempotently wire any new demos/code/buttons as the template streams in ----
@@ -935,10 +954,9 @@ while True:
         btn.addEventListener("click", () => {
           const code = CODE[btn.dataset.run]; if (!code) return;
           const key = btn.dataset.run;
-          if (liveKey === key) { stopLive(); return; }   // toggle back to the static visualization
+          if (liveKey === key) { stopLive(); return; }   // toggle back to the static viz + code
           const url = RUNNER_URL + "#code=" + b64url(code);
-          const viz = btn.closest("[data-section]").querySelector("[data-viz]");
-          startLive(key, url, viz, btn);
+          startLive(key, url, btn.closest("[data-section]"), btn);
         });
         btn.addEventListener("mouseenter", () => { btn.style.transform = "translate(-1px,-1px)"; btn.style.boxShadow = "3px 3px 0 rgba(0,0,0,.5)"; });
         btn.addEventListener("mouseleave", () => { btn.style.transform = ""; btn.style.boxShadow = "2px 2px 0 rgba(0,0,0,.5)"; });

@@ -23,12 +23,13 @@
             padding:3px 9px; border-radius:99px; background:#0d1322; border:1px solid var(--edge); }
   #status.running { color:var(--accent); } #status.error { color:var(--bad); } #status.boot { color:var(--warn); }
   main { flex:1 1 0; display:flex; min-height:0; }
-  #editorPane { flex:1 1 46%; min-width:240px; display:flex; border-right:2px solid var(--edge); }
+  /* Canvas (visualizer) on the LEFT, editable code on the RIGHT — ordered via flex `order`. */
+  #editorPane { order:2; flex:1 1 46%; min-width:240px; display:flex; border-left:2px solid var(--edge); }
   #code { flex:1; width:100%; resize:none; border:0; outline:none; background:#0b0e16; color:#e6ebf7;
           padding:10px 12px; font:13px/1.55 'JetBrains Mono',ui-monospace,Menlo,monospace;
           tab-size:4; -moz-tab-size:4; white-space:pre; overflow:auto; }
   #code:focus { background:#0c1018; }
-  #rightPane { flex:1 1 54%; min-width:260px; display:flex; flex-direction:column; min-height:0; }
+  #rightPane { order:1; flex:1 1 54%; min-width:260px; display:flex; flex-direction:column; min-height:0; }
   #stage { flex:1 1 auto; display:flex; align-items:center; justify-content:center;
            overflow:auto; background:#070810; padding:12px; }
   #canvas { background:#000; outline:none; border:1px solid var(--edge); border-radius:4px;
@@ -38,7 +39,7 @@
              padding:7px 11px; font-size:11.5px; white-space:pre-wrap; }
   #console .err { color:var(--bad); } #console .sys { color:var(--dim); font-style:italic; }
   .hint { color:var(--dim); font-size:11px; }
-  @media (max-width:560px) { main { flex-direction:column; } #editorPane { border-right:0; border-bottom:2px solid var(--edge); } }
+  @media (max-width:560px) { main { flex-direction:column; } #editorPane { border-left:0; border-top:2px solid var(--edge); } }
 </style>
 </head>
 <body>
