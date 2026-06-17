@@ -643,7 +643,9 @@ while True:
 
       // 1-D number line model
       const LX0 = 72, LX1 = 470, AXISY = 168;
-      const A1 = { l: 30, r: 58 }; const B1 = { l: 48, r: 82 };
+      // B is narrow enough (width 24) that it can clear A fully on BOTH sides
+      // within 0–100: left-clear B=[0,24] vs A.l=38, right-clear B=[76,100] vs A.r=62.
+      const A1 = { l: 38, r: 62 }; const B1 = { l: 50, r: 74 };
       const w2x = (v) => LX0 + (v / 100) * (LX1 - LX0);
       const x2w = (x) => ((x - LX0) / (LX1 - LX0)) * 100;
       const p1 = () => B1.l < A1.r;          // Piece 1: B starts before A ends
