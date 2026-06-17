@@ -636,354 +636,6 @@ while True:
     }
 
     function initBuilder(c) { return initBuilder3(c); }
-    function initBuilderDEAD(c) {
-      const ctx = c.getContext("2d"); const sec = c.closest("[data-section]");
-      const L = 44, Bm = 50, T = 14, Rr = 14;
-      const A = { x: 110, y: 66, w: 152, h: 120 }; const B = { x: 256, y: 158, w: 124, h: 96 };
-      let mode = null, ox = 0, oy = 0;
-      const inB = (mx, my) => mx >= B.x && mx <= B.x + B.w && my >= B.y && my <= B.y + B.h;
-      c.addEventListener("mousedown", (e) => { const [mx, my] = relMouse(c, e); if (inB(mx, my)) { mode = "move"; ox = mx - B.x; oy = my - B.y; } e.preventDefault(); });
-      window.addEventListener("mousemove", (e) => { if (mode !== "move") return; const [mx, my] = relMouse(c, e); B.x = clamp(mx - ox, L + 4, c.width - Rr - B.w - 4); B.y = clamp(my - oy, T + 4, c.height - Bm - B.h - 4); });
-      window.addEventListener("mouseup", () => { mode = null; });
-      c.addEventListener("mousemove", (e) => { const [mx, my] = relMouse(c, e); c.style.cursor = inB(mx, my) ? "move" : "default"; });
-      const m = (r) => ({ left: r.x, right: r.x + r.w, top: r.y, bottom: r.y + r.h });
-      const truthX = () => m(A).left < m(B).right && m(A).right > m(B).left;
-      const truthY = () => m(A).top < m(B).bottom && m(A).bottom > m(B).top;
-      const OPTS = {
-        1: [{ h: "A.left < B.right and A.right > B.left", correct: true, test: () => m(A).left < m(B).right && m(A).right > m(B).left },
-            { h: "A.left < B.left and A.right < B.right", test: () => m(A).left < m(B).left && m(A).right < m(B).right },
-            { h: "A.right < B.left", test: () => m(A).right < m(B).left },
-            { h: "A.left > B.right or A.right < B.left", test: () => m(A).left > m(B).right || m(A).right < m(B).left }],
-        2: [{ h: "A.top < B.bottom and A.bottom > B.top", correct: true, test: () => m(A).top < m(B).bottom && m(A).bottom > m(B).top },
-            { h: "A.top < B.top and A.bottom < B.bottom", test: () => m(A).top < m(B).top && m(A).bottom < m(B).bottom },
-            { h: "A.bottom < B.top", test: () => m(A).bottom < m(B).top },
-            { h: "A.top > B.bottom or A.bottom < B.top", test: () => m(A).top > m(B).bottom || m(A).bottom < m(B).top }],
-        3: [{ h: "x_overlap and y_overlap", correct: true, test: () => truthX() && truthY() },
-            { h: "x_overlap or y_overlap", test: () => truthX() || truthY() },
-            { h: "not (x_overlap and y_overlap)", test: () => !(truthX() && truthY()) }],
-      };
-      const realTruth = { 1: truthX, 2: truthY, 3: () => truthX() && truthY(), 4: () => truthX() && truthY() };
-      const st = { step: 0, armed: null, revealed: false, explain: "" };
-      const el = (s) => sec.querySelector(s);
-      function updateCond() {
-        const cEl = el("[data-bcond]"); if (!cEl) return;
-        const X = 'A.left &lt; B.right <span style="color:#ff6ec7">and</span> A.right &gt; B.left';
-        const Y = 'A.top &lt; B.bottom <span style="color:#ff6ec7">and</span> A.bottom &gt; B.top';
-        const kIf = '<span style="color:#ff6ec7">if</span>', kAnd = '<span style="color:#ff6ec7">and</span>', kT = '<span style="color:#5ad1e8">True</span>';
-        if (st.step < 2) { cEl.innerHTML = '<span style="color:#6a7290"># your condition appears here as you build it…</span>'; return; }
-        if (st.step === 2) { cEl.innerHTML = `${kIf} ( ${X} ):\n    collision = ${kT}`; return; }
-        cEl.innerHTML = `${kIf} ( ${X}\n     ${kAnd} ${Y} ):\n    collision = ${kT}`;
-      }
-      function tokenBreakdown() {
-        const toks = [
-          ["A", "the first rectangle — a Rect object", "#fff"],
-          [".left", "A's left edge · the same number as A.x", "#8fb8ff"],
-          ["<", "“is less than” → sits further left", "#ffd166"],
-          ["B.right", "B's right edge · equals B.x + B.width", "#9be88f"],
-          ["and", "BOTH sides of this and must be True", "#ff6ec7"],
-          ["A.right", "A's right edge · equals A.x + A.width", "#8fb8ff"],
-          [">", "“is greater than” → sits further right", "#ffd166"],
-          ["B.left", "B's left edge · the same number as B.x", "#9be88f"],
-          ["and", "joins the x-test to the y-test — all four must hold", "#ff6ec7"],
-          ["A.top … B.top", "the y-axis pair: identical logic, swap left/right → top/bottom", "#6a7290"],
-        ];
-        return toks.map((t) => `<div style="display:flex;gap:14px;align-items:baseline;padding:6px 0;border-bottom:1px solid #11151f;"><code style="flex:0 0 120px;color:${t[2]};font-size:13px;font-weight:700">${t[0]}</code><span style="color:#aab0c4;font-size:12.5px;line-height:1.5">${t[1]}</span></div>`).join("");
-      }
-      function renderUI() {
-        const stepEl = el("[data-bstep]"), optsEl = el("[data-bopts]"), feedEl = el("[data-bfeed]"), nextEl = el("[data-bnext]");
-        st.armed = null; feedEl.innerHTML = "";
-        if (st.step === 0) {
-          stepEl.innerHTML = `<b style="color:#ffd166">Step 0 — the big idea.</b> A collision is just <b style="color:#fff">overlap</b>, and two boxes overlap only if their shadows overlap on the <b style="color:#5ad1e8">x-axis</b> AND the <b style="color:#9be88f">y-axis</b> at once. Drag <b style="color:#9be88f">B</b> and watch the two projection bars.`;
-          optsEl.innerHTML = ""; nextEl.style.display = ""; nextEl.textContent = "Start building →"; nextEl.onclick = () => { st.step = 1; st.revealed = false; st.explain = ""; renderUI(); };
-        } else if (st.step <= 3) {
-          const titles = { 1: "Step 1 — overlap on the X-axis", 2: "Step 2 — overlap on the Y-axis", 3: "Step 3 — combine them" };
-          const explainQ = {
-            1: 'In your own words — when do the two boxes overlap on the <b style="color:#5ad1e8">X-axis</b>? Think about A\'s left/right edges versus B\'s.',
-            2: 'Now say the <b style="color:#9be88f">Y-axis</b> overlap in words — same idea, swap left/right for top/bottom.',
-            3: 'You have <code style="color:#5ad1e8">x_overlap</code> and <code style="color:#9be88f">y_overlap</code>. In words, how do they combine into a real collision?',
-          };
-          stepEl.innerHTML = `<b style="color:#ffd166">${titles[st.step]}.</b> ` + (st.revealed
-            ? "Compare your wording with the choices below — drag B to test any of them."
-            : "Try it in words first. The answer choices unlock once you've written your explanation.");
-          optsEl.innerHTML = "";
-          if (!st.revealed) {
-            const q = document.createElement("div");
-            q.style.cssText = "font-size:13px;color:#9aa2bb;margin:0 0 9px;line-height:1.6;";
-            q.innerHTML = explainQ[st.step];
-            const ta = document.createElement("textarea");
-            ta.placeholder = "Type your reasoning… (no code needed — just the idea)";
-            ta.value = st.explain || "";
-            ta.style.cssText = "width:100%;box-sizing:border-box;min-height:76px;resize:vertical;background:#0c1018;border:2px solid #232a3d;color:#e6ebf7;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.55;padding:10px;outline:none;";
-            ta.addEventListener("focus", () => { ta.style.borderColor = "#ffd166"; });
-            ta.addEventListener("blur", () => { ta.style.borderColor = "#232a3d"; });
-            const rev = document.createElement("button");
-            rev.textContent = "Reveal the answer choices →";
-            rev.style.cssText = "margin-top:10px;font-family:'Press Start 2P',monospace;font-size:8.5px;background:var(--a);color:#07080f;border:none;padding:10px 12px;box-shadow:2px 2px 0 rgba(0,0,0,.5);";
-            const sync = () => { const ok = ta.value.trim().length >= 12; rev.disabled = !ok; rev.style.opacity = ok ? "1" : "0.4"; rev.style.cursor = ok ? "pointer" : "not-allowed"; };
-            ta.addEventListener("input", () => { st.explain = ta.value; sync(); });
-            rev.onclick = () => { if (ta.value.trim().length < 12) return; st.explain = ta.value; st.revealed = true; renderUI(); };
-            const hint = document.createElement("div");
-            hint.style.cssText = "font-size:11.5px;color:#6a7290;margin-top:8px;";
-            hint.textContent = "Write at least a sentence — then reveal the options to check yourself.";
-            optsEl.appendChild(q); optsEl.appendChild(ta); optsEl.appendChild(rev); optsEl.appendChild(hint);
-            sync();
-            nextEl.style.display = "none";
-          } else {
-            if (st.explain && st.explain.trim()) {
-              const quote = document.createElement("div");
-              quote.style.cssText = "background:#0c1018;border-left:3px solid #6a7290;padding:8px 11px;margin:0 0 12px;font-size:12px;color:#9aa2bb;font-style:italic;";
-              quote.textContent = "you said: “" + st.explain.trim() + "”";
-              optsEl.appendChild(quote);
-            }
-            const pickLbl = document.createElement("div");
-            pickLbl.style.cssText = "font-size:12.5px;color:#cdd3e6;margin:0 0 10px;";
-            pickLbl.textContent = "Now pick the line that matches your reasoning:";
-            optsEl.appendChild(pickLbl);
-            OPTS[st.step].forEach((o) => {
-              const b = document.createElement("button");
-              b.textContent = o.h;
-              b.style.cssText = "display:block;width:100%;text-align:left;margin:0 0 8px;padding:11px 12px;background:#0c1018;border:2px solid #232a3d;color:#cdd3e6;font-family:'JetBrains Mono',monospace;font-size:12.5px;cursor:pointer;";
-              b.onclick = () => {
-                st.armed = o;
-                [...optsEl.querySelectorAll("button")].forEach((ch) => { ch.style.borderColor = "#232a3d"; ch.style.background = "#0c1018"; });
-                b.style.borderColor = o.correct ? "#9be88f" : "#ff6e6e"; b.style.background = o.correct ? "rgba(110,231,160,0.08)" : "rgba(255,110,110,0.08)";
-                if (o.correct) { feedEl.innerHTML = `<span style="color:#9be88f">✓ That's it.</span> Drag B anywhere — your rule stays in lock-step with the picture. Lock it in.`; nextEl.style.display = ""; nextEl.textContent = "Lock it in →"; nextEl.onclick = () => { st.step++; st.revealed = false; st.explain = ""; renderUI(); }; }
-                else { feedEl.innerHTML = `<span style="color:#ff6e6e">✗ Not quite.</span> Drag B around — you'll hit a spot where this rule disagrees with the bars. Then try another.`; nextEl.style.display = "none"; }
-              };
-              optsEl.appendChild(b);
-            });
-            nextEl.style.display = "none";
-          }
-        } else {
-          stepEl.innerHTML = `<b style="color:#9be88f">Done — you just built <code style="color:#fff">A.colliderect(B)</code> from nothing.</b> Drag B: the lamp now runs your full four-part condition. This exact line is what pygame checks.`;
-          optsEl.innerHTML = ""; nextEl.style.display = "none";
-          const tb = el("[data-btokens]"); if (tb) { tb.innerHTML = tokenBreakdown(); tb.closest("[data-btok-wrap]").style.display = ""; }
-        }
-        updateCond();
-      }
-      function frame() {
-        grid(ctx, c.width, c.height);
-        ctx.fillStyle = "#0c1018"; ctx.fillRect(0, c.height - Bm, c.width, Bm); ctx.fillRect(0, 0, L, c.height);
-        ctx.strokeStyle = "#1a2030"; ctx.lineWidth = 1; ctx.strokeRect(.5, .5, L, c.height - 1); ctx.strokeRect(.5, c.height - Bm + .5, c.width - 1, Bm - 1);
-        tag(ctx, L + 6, c.height - Bm + 16, "x-axis ↓ shadows", "#5a6378");
-        ctx.save(); ctx.translate(15, c.height - Bm - 8); ctx.rotate(-Math.PI / 2); tag(ctx, 0, 0, "y-axis → shadows", "#5a6378"); ctx.restore();
-        const box = (r, col, fill, lab) => { ctx.fillStyle = fill; ctx.fillRect(r.x, r.y, r.w, r.h); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.strokeRect(r.x + .5, r.y + .5, r.w, r.h); tag(ctx, r.x + 5, r.y + 15, lab, col); };
-        box(A, "#5ad1e8", "rgba(90,209,232,0.10)", "A (fixed)");
-        box(B, "#9be88f", "rgba(155,232,143,0.12)", "B (drag me)");
-        const barY = c.height - Bm;
-        [["#5ad1e8", A], ["#9be88f", B]].forEach(([col, r]) => { dash(ctx, r.x, r.y + r.h, r.x, barY, col); dash(ctx, r.x + r.w, r.y + r.h, r.x + r.w, barY, col); });
-        ctx.fillStyle = "#5ad1e8"; ctx.fillRect(A.x, barY + 9, A.w, 7);
-        ctx.fillStyle = "#9be88f"; ctx.fillRect(B.x, barY + 22, B.w, 7);
-        const oxL = Math.max(A.x, B.x), oxR = Math.min(A.x + A.w, B.x + B.w);
-        if (oxR > oxL) { ctx.fillStyle = "rgba(255,209,102,0.9)"; ctx.fillRect(oxL, barY + 16, oxR - oxL, 6); }
-        [["#5ad1e8", A], ["#9be88f", B]].forEach(([col, r]) => { dash(ctx, r.x, r.y, L, r.y, col); dash(ctx, r.x, r.y + r.h, L, r.y + r.h, col); });
-        ctx.fillStyle = "#5ad1e8"; ctx.fillRect(L - 22, A.y, 7, A.h);
-        ctx.fillStyle = "#9be88f"; ctx.fillRect(L - 34, B.y, 7, B.h);
-        const oyT = Math.max(A.y, B.y), oyB = Math.min(A.y + A.h, B.y + B.h);
-        if (oyB > oyT) { ctx.fillStyle = "rgba(255,209,102,0.9)"; ctx.fillRect(L - 28, oyT, 6, oyB - oyT); }
-        const lamp = el("[data-blamp]");
-        if (lamp) {
-          if (st.step >= 1 && st.step <= 3 && st.armed) { const rule = !!st.armed.test(); const real = !!realTruth[st.step](); const ok = rule === real; lamp.innerHTML = `<span style="color:#7a8099">your rule:</span> <b style="color:${rule ? "#ff6e6e" : "#9be88f"}">${rule ? "HIT" : "clear"}</b><span style="color:#3f4762"> &nbsp;|&nbsp; </span><span style="color:#7a8099">the bars:</span> <b style="color:${real ? "#ff6e6e" : "#9be88f"}">${real ? "overlap" : "apart"}</b><span style="color:#3f4762"> &nbsp;|&nbsp; </span><b style="color:${ok ? "#9be88f" : "#ffd166"}">${ok ? "✓ agree" : "✗ DISAGREE"}</b>`; }
-          else if (st.step >= 4) { const real = !!realTruth[4](); lamp.innerHTML = `<span style="color:#7a8099">A.colliderect(B) →</span> <b style="color:${real ? "#ff6e6e" : "#9be88f"}">${real ? "True · overlap" : "False · apart"}</b>`; }
-          else { lamp.innerHTML = `<span style="color:#5ad1e8">x-overlap: ${truthX() ? "yes" : "no"}</span><span style="color:#3f4762"> &nbsp;·&nbsp; </span><span style="color:#9be88f">y-overlap: ${truthY() ? "yes" : "no"}</span>`; }
-        }
-        requestAnimationFrame(frame);
-      }
-      renderUI(); frame();
-    }
-
-    function initBuilder2DEAD(c) {
-      const ctx = c.getContext("2d"); const sec = c.closest("[data-section]");
-      const el = (s) => sec.querySelector(s);
-      function esc(s) { return s.replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-
-      // 1-D number line model
-      const LX0 = 72, LX1 = 470, AXISY = 168;
-      const A1 = { l: 18, r: 46 }; const B1 = { l: 40, r: 74 };
-      const w2x = (v) => LX0 + (v / 100) * (LX1 - LX0);
-      const x2w = (x) => ((x - LX0) / (LX1 - LX0)) * 100;
-      const ov1 = () => A1.l < B1.r && A1.r > B1.l;
-
-      // 2-D rectangle model (final phase)
-      const Lp = 44, Bm = 50;
-      const A2 = { x: 116, y: 60, w: 150, h: 116 }; const B2 = { x: 258, y: 150, w: 122, h: 96 };
-      const m = (r) => ({ left: r.x, right: r.x + r.w, top: r.y, bottom: r.y + r.h });
-      const tX = () => m(A2).left < m(B2).right && m(A2).right > m(B2).left;
-      const tY = () => m(A2).top < m(B2).bottom && m(A2).bottom > m(B2).top;
-
-      const st = { phase: "intro", explain: "", slot: 0 };
-      const vals = {};
-      const order = ["c1a", "c1b", "c1c", "c2a", "c2b", "c2c", "join"];
-      const allFilled = () => order.every((k) => vals[k]);
-      let mode = null, ox = 0, oy = 0;
-
-      c.addEventListener("mousedown", (e) => {
-        const [mx, my] = relMouse(c, e);
-        if (st.phase === "rect") { if (mx >= B2.x && mx <= B2.x + B2.w && my >= B2.y && my <= B2.y + B2.h) { mode = "m2"; ox = mx - B2.x; oy = my - B2.y; } }
-        else { const bl = w2x(B1.l), br = w2x(B1.r); if (mx >= bl - 8 && mx <= br + 8 && my >= AXISY + 18 && my <= AXISY + 62) { mode = "m1"; ox = mx - bl; } }
-        e.preventDefault();
-      });
-      window.addEventListener("mousemove", (e) => {
-        if (!mode) return; const [mx, my] = relMouse(c, e);
-        if (mode === "m1") { const sp = B1.r - B1.l; const nl = clamp(x2w(mx - ox), 0, 100 - sp); B1.l = nl; B1.r = nl + sp; }
-        else if (mode === "m2") { B2.x = clamp(mx - ox, Lp + 4, c.width - 14 - B2.w - 4); B2.y = clamp(my - oy, 14, c.height - Bm - B2.h - 4); }
-      });
-      window.addEventListener("mouseup", () => { mode = null; });
-      c.addEventListener("mousemove", (e) => { const [mx, my] = relMouse(c, e); if (st.phase === "rect") { c.style.cursor = (mx >= B2.x && mx <= B2.x + B2.w && my >= B2.y && my <= B2.y + B2.h) ? "move" : "default"; } else { const bl = w2x(B1.l), br = w2x(B1.r); c.style.cursor = (mx >= bl - 8 && mx <= br + 8 && my >= AXISY + 18 && my <= AXISY + 62) ? "grab" : "default"; } });
-
-      const SLOTS = [
-        { key: "c1a", edge: ["A", "l"], q: 'Clause&nbsp;1 means “<b style="color:#fff">A starts before B ends</b>.” Which edge is A’s <i>start</i> — its earliest point?', opts: [{ t: "A.left", ok: true }, { t: "A.right" }], why: "A.left is A’s smallest value — its starting edge.", wrong: "A.right is the far end. A’s start is A.left." },
-        { key: "c1b", q: '“starts <b style="color:#fff">before</b>” → pick the comparison meaning <i>is less than</i>.', opts: [{ t: "<", ok: true }, { t: ">" }], why: "“before / smaller” on a line is the < sign.", wrong: "> means greater / further right. “before” is <." },
-        { key: "c1c", edge: ["B", "r"], q: '…before <i>which</i> edge of B — B’s <b style="color:#fff">end</b>?', opts: [{ t: "B.right", ok: true }, { t: "B.left" }], why: "B’s end (its latest point) is B.right.", wrong: "B.left is B’s start. We need B’s end: B.right." },
-        { key: "c2a", edge: ["A", "r"], q: 'Clause&nbsp;2 means “<b style="color:#fff">A ends after B starts</b>.” Which edge is A’s <i>end</i>?', opts: [{ t: "A.right", ok: true }, { t: "A.left" }], why: "A.right is A’s largest value — its ending edge.", wrong: "A.left is the start. A’s end is A.right." },
-        { key: "c2b", q: '“ends <b style="color:#fff">after</b>” → pick the comparison meaning <i>is greater than</i>.', opts: [{ t: ">", ok: true }, { t: "<" }], why: "“after / bigger” is the > sign.", wrong: "< means less. “after” is >." },
-        { key: "c2c", edge: ["B", "l"], q: '…after <i>which</i> edge of B — B’s <b style="color:#fff">start</b>?', opts: [{ t: "B.left", ok: true }, { t: "B.right" }], why: "B’s start (its earliest point) is B.left.", wrong: "B.right is B’s end. We need B’s start: B.left." },
-        { key: "join", q: 'Both clauses must be true <b style="color:#fff">at once</b>. Which keyword?', opts: [{ t: "and", ok: true }, { t: "or" }], why: "and = both must hold. or would be too loose.", wrong: "or is true when only one holds — it reports overlap when there is none. Use and." },
-      ];
-
-      function tok(key) {
-        const active = st.phase === "build" && order[st.slot] === key;
-        if (vals[key]) { const col = key === "join" ? "#ff6ec7" : (key.endsWith("b") ? "#ffd166" : "#e6ebf7"); return `<span style="color:${col}">${esc(vals[key])}</span>`; }
-        return `<span style="display:inline-block;min-width:50px;text-align:center;color:${active ? "#ffd166" : "#3f4762"};border-bottom:3px solid ${active ? "#ffd166" : "#283150"};">${active ? "?" : "·"}</span>`;
-      }
-      function slotPanel() {
-        return `<div style="font-family:'JetBrains Mono',monospace;font-size:16px;line-height:2.2;color:#cdd3e6;letter-spacing:.5px;">` +
-          `${tok("c1a")} ${tok("c1b")} ${tok("c1c")}<br>` +
-          `<span style="padding-left:2px">${tok("join")}</span><br>` +
-          `${tok("c2a")} ${tok("c2b")} ${tok("c2c")}</div>`;
-      }
-      function tokenBreakdown() {
-        const toks = [
-          ["A.left", "A’s left edge — its starting point on the x-axis (= A.x)", "#8fb8ff"],
-          ["<", "“is less than” → sits further left / earlier", "#ffd166"],
-          ["B.right", "B’s right edge — its end (= B.x + B.width)", "#9be88f"],
-          ["and", "BOTH sides of this and must be True", "#ff6ec7"],
-          ["A.right", "A’s right edge — its end (= A.x + A.width)", "#8fb8ff"],
-          [">", "“is greater than” → sits further right / later", "#ffd166"],
-          ["B.left", "B’s left edge — its start (= B.x)", "#9be88f"],
-          ["and", "joins the x-line test to the y-line test — all four must hold", "#ff6ec7"],
-          ["A.top … B.top", "the y-axis pair: the exact same line test, on top/bottom", "#6a7290"],
-        ];
-        return toks.map((t) => `<div style="display:flex;gap:14px;align-items:baseline;padding:6px 0;border-bottom:1px solid #11151f;"><code style="flex:0 0 120px;color:${t[2]};font-size:13px;font-weight:700">${t[0]}</code><span style="color:#aab0c4;font-size:12.5px;line-height:1.5">${t[1]}</span></div>`).join("");
-      }
-      function updateCond() {
-        const cEl = el("[data-bcond]"); if (!cEl) return;
-        const X = 'A.left &lt; B.right <span style="color:#ff6ec7">and</span> A.right &gt; B.left';
-        const Y = 'A.top &lt; B.bottom <span style="color:#ff6ec7">and</span> A.bottom &gt; B.top';
-        const kIf = '<span style="color:#ff6ec7">if</span>', kT = '<span style="color:#5ad1e8">True</span>', kAnd = '<span style="color:#ff6ec7">and</span>';
-        if (st.phase === "rect") { cEl.innerHTML = `${kIf} ( ${X}\n     ${kAnd} ${Y} ):\n    collision = ${kT}`; return; }
-        if (st.phase === "done1d" || (st.phase === "build" && allFilled())) { cEl.innerHTML = `<span style="color:#5a6378"># the 1-D line test</span>\n${kIf} ( ${X} ):\n    overlap = ${kT}`; return; }
-        cEl.innerHTML = '<span style="color:#6a7290"># it assembles above, one token at a time…</span>';
-      }
-      function renderUI() {
-        const stepEl = el("[data-bstep]"), optsEl = el("[data-bopts]"), feedEl = el("[data-bfeed]"), nextEl = el("[data-bnext]"), slotsEl = el("[data-bslots]");
-        feedEl.innerHTML = ""; nextEl.style.display = "none"; optsEl.innerHTML = "";
-        if (st.phase === "intro") {
-          slotsEl.style.display = "none";
-          stepEl.innerHTML = `<b style="color:#ffd166">Start on a line, not a grid.</b> Two segments, <b style="color:#5ad1e8">A</b> and <b style="color:#9be88f">B</b>, sit on a number line — each is just a <b>left</b> and a <b>right</b>. Drag B. <b style="color:#fff">In your own words, when do they overlap?</b>`;
-          const ta = document.createElement("textarea");
-          ta.placeholder = "Type your reasoning… (no code — just the idea)";
-          ta.value = st.explain || "";
-          ta.style.cssText = "width:100%;box-sizing:border-box;min-height:74px;resize:vertical;background:#0c1018;border:2px solid #232a3d;color:#e6ebf7;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.55;padding:10px;outline:none;";
-          ta.addEventListener("focus", () => ta.style.borderColor = "#ffd166");
-          ta.addEventListener("blur", () => ta.style.borderColor = "#232a3d");
-          const rev = document.createElement("button");
-          rev.textContent = "Start building →";
-          rev.style.cssText = "margin-top:10px;font-family:'Press Start 2P',monospace;font-size:8.5px;background:var(--a);color:#07080f;border:none;padding:10px 12px;box-shadow:2px 2px 0 rgba(0,0,0,.5);";
-          const sync = () => { const ok = ta.value.trim().length >= 12; rev.disabled = !ok; rev.style.opacity = ok ? "1" : "0.4"; rev.style.cursor = ok ? "pointer" : "not-allowed"; };
-          ta.addEventListener("input", () => { st.explain = ta.value; sync(); });
-          rev.onclick = () => { if (ta.value.trim().length < 12) return; st.phase = "build"; st.slot = 0; renderUI(); };
-          const hint = document.createElement("div"); hint.style.cssText = "font-size:11.5px;color:#6a7290;margin-top:8px;"; hint.textContent = "Write at least a sentence — then build the line test token by token.";
-          optsEl.appendChild(ta); optsEl.appendChild(rev); optsEl.appendChild(hint); sync();
-        } else if (st.phase === "build") {
-          slotsEl.style.display = ""; slotsEl.innerHTML = slotPanel();
-          const s = SLOTS[st.slot];
-          stepEl.innerHTML = `<b style="color:#ffd166">Token ${st.slot + 1} of 7.</b> <span style="color:#cdd3e6">${s.q}</span>`;
-          s.opts.forEach((o) => {
-            const b = document.createElement("button");
-            b.textContent = o.t;
-            b.style.cssText = "display:inline-block;min-width:92px;text-align:center;margin:0 8px 8px 0;padding:11px 14px;background:#0c1018;border:2px solid #232a3d;color:#e6ebf7;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;cursor:pointer;";
-            b.onclick = () => {
-              if (o.ok) {
-                vals[s.key] = o.t; b.style.borderColor = "#9be88f"; b.style.background = "rgba(110,231,160,0.10)";
-                feedEl.innerHTML = `<span style="color:#9be88f">✓</span> <span style="color:#aab0c4">${s.why}</span>`;
-                slotsEl.innerHTML = slotPanel();
-                [...optsEl.querySelectorAll("button")].forEach((x) => x.disabled = true);
-                setTimeout(() => { st.slot++; if (st.slot >= SLOTS.length) st.phase = "done1d"; renderUI(); }, 720);
-              } else {
-                b.style.borderColor = "#ff6e6e"; b.style.background = "rgba(255,110,110,0.10)";
-                feedEl.innerHTML = `<span style="color:#ff6e6e">✗</span> <span style="color:#aab0c4">${s.wrong}</span>`;
-              }
-            };
-            optsEl.appendChild(b);
-          });
-          if (st.explain && st.explain.trim()) { const q = document.createElement("div"); q.style.cssText = "margin-top:10px;background:#0c1018;border-left:3px solid #6a7290;padding:7px 10px;font-size:11.5px;color:#9aa2bb;font-style:italic;"; q.textContent = "your words: “" + st.explain.trim() + "”"; optsEl.appendChild(q); }
-        } else if (st.phase === "done1d") {
-          slotsEl.style.display = ""; slotsEl.innerHTML = slotPanel();
-          stepEl.innerHTML = `<b style="color:#9be88f">That's the whole 1-D test.</b> Read it aloud: “<i style="color:#cdd3e6">A starts before B ends, AND A ends after B starts.</i>” Drag B — your test agrees with the gold overlap mark every time.`;
-          nextEl.style.display = ""; nextEl.textContent = "Now make it a rectangle →"; nextEl.onclick = () => { st.phase = "rect"; st.ridx = 0; renderUI(); };
-        } else {
-          slotsEl.style.display = "none";
-          stepEl.innerHTML = `<b style="color:#9be88f">A rectangle is just two of these lines.</b> It has a left/right on the <b style="color:#5ad1e8">x-axis</b> and a top/bottom on the <b style="color:#9be88f">y-axis</b>. Run your exact line test on <b>each</b> axis and require <b>both</b> with <code style="color:#fff">and</code> — that is <code style="color:#fff">colliderect()</code>. Drag B.`;
-          const tb = el("[data-btokens]"); if (tb) { tb.innerHTML = tokenBreakdown(); tb.closest("[data-btok-wrap]").style.display = ""; }
-        }
-        updateCond();
-      }
-
-      function seg1(s, yy, col, name) {
-        const x1 = w2x(s.l), x2 = w2x(s.r);
-        dash(ctx, x1, yy, x1, AXISY, "rgba(150,170,210,0.30)"); dash(ctx, x2, yy, x2, AXISY, "rgba(150,170,210,0.30)");
-        ctx.fillStyle = col; ctx.fillRect(x1, yy - 7, x2 - x1, 14);
-        dot(ctx, x1, yy, "#fff", 4); dot(ctx, x2, yy, "#fff", 4);
-        const ly = yy < AXISY ? yy - 12 : yy + 22;
-        tag(ctx, x1 - 12, ly, name + ".left", col); tag(ctx, x2 - 8, ly, name + ".right", col);
-        tag(ctx, w2x(s.l) - 26, yy + 4, name, col);
-      }
-      function draw1d() {
-        grid(ctx, c.width, c.height);
-        const y = AXISY;
-        ctx.strokeStyle = "#3f4762"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(LX0 - 12, y); ctx.lineTo(LX1 + 12, y); ctx.stroke();
-        ctx.fillStyle = "#2a3350"; for (let v = 0; v <= 100; v += 10) { const x = w2x(v); ctx.fillRect(x, y - 4, 1, 8); }
-        tag(ctx, LX0 - 12, y + 26, "one axis · every value is one number", "#5a6378");
-        const oL = Math.max(A1.l, B1.l), oR = Math.min(A1.r, B1.r);
-        if (oR > oL) { ctx.fillStyle = "rgba(255,209,102,0.85)"; ctx.fillRect(w2x(oL), y - 6, w2x(oR) - w2x(oL), 12); tag(ctx, (w2x(oL) + w2x(oR)) / 2 - 22, y - 11, "overlap", "#ffd166"); }
-        seg1(A1, y - 44, "#5ad1e8", "A");
-        seg1(B1, y + 44, "#9be88f", "B");
-        const s = st.phase === "build" ? SLOTS[st.slot] : null;
-        if (s && s.edge) { const seg = s.edge[0] === "A" ? A1 : B1; const yy = s.edge[0] === "A" ? y - 44 : y + 44; const vx = w2x(s.edge[1] === "l" ? seg.l : seg.r); ctx.strokeStyle = "#ffd166"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(vx, yy, 13, 0, 7); ctx.stroke(); }
-        const lamp = el("[data-blamp]");
-        if (lamp) {
-          if (st.phase === "done1d" || (st.phase === "build" && allFilled())) { const r = ov1(); lamp.innerHTML = `<span style="color:#7a8099">your test →</span> <b style="color:${r ? "#ff6e6e" : "#9be88f"}">${r ? "overlap" : "apart"}</b><span style="color:#3f4762"> &nbsp;·&nbsp; </span><span style="color:#7a8099">the line →</span> <b style="color:${r ? "#ff6e6e" : "#9be88f"}">${r ? "overlap" : "apart"}</b><span style="color:#3f4762"> &nbsp;·&nbsp; </span><b style="color:#9be88f">✓ agree</b>`; }
-          else { lamp.innerHTML = `<span style="color:#5ad1e8">A.left=${Math.round(A1.l)} · A.right=${Math.round(A1.r)}</span><span style="color:#3f4762"> &nbsp;|&nbsp; </span><span style="color:#9be88f">B.left=${Math.round(B1.l)} · B.right=${Math.round(B1.r)}</span>`; }
-        }
-      }
-      function draw2d() {
-        grid(ctx, c.width, c.height);
-        ctx.fillStyle = "#0c1018"; ctx.fillRect(0, c.height - Bm, c.width, Bm); ctx.fillRect(0, 0, Lp, c.height);
-        ctx.strokeStyle = "#1a2030"; ctx.lineWidth = 1; ctx.strokeRect(.5, .5, Lp, c.height - 1); ctx.strokeRect(.5, c.height - Bm + .5, c.width - 1, Bm - 1);
-        tag(ctx, Lp + 6, c.height - Bm + 16, "x-axis line test", "#5a6378");
-        ctx.save(); ctx.translate(15, c.height - Bm - 8); ctx.rotate(-Math.PI / 2); tag(ctx, 0, 0, "y-axis line test", "#5a6378"); ctx.restore();
-        const box = (r, col, fill, lab) => { ctx.fillStyle = fill; ctx.fillRect(r.x, r.y, r.w, r.h); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.strokeRect(r.x + .5, r.y + .5, r.w, r.h); tag(ctx, r.x + 5, r.y + 15, lab, col); };
-        box(A2, "#5ad1e8", "rgba(90,209,232,0.10)", "A");
-        box(B2, "#9be88f", "rgba(155,232,143,0.12)", "B (drag)");
-        const barY = c.height - Bm;
-        [["#5ad1e8", A2], ["#9be88f", B2]].forEach(([col, r]) => { dash(ctx, r.x, r.y + r.h, r.x, barY, col); dash(ctx, r.x + r.w, r.y + r.h, r.x + r.w, barY, col); });
-        ctx.fillStyle = "#5ad1e8"; ctx.fillRect(A2.x, barY + 9, A2.w, 7);
-        ctx.fillStyle = "#9be88f"; ctx.fillRect(B2.x, barY + 22, B2.w, 7);
-        const oxL = Math.max(A2.x, B2.x), oxR = Math.min(A2.x + A2.w, B2.x + B2.w); if (oxR > oxL) { ctx.fillStyle = "rgba(255,209,102,0.9)"; ctx.fillRect(oxL, barY + 16, oxR - oxL, 6); }
-        [["#5ad1e8", A2], ["#9be88f", B2]].forEach(([col, r]) => { dash(ctx, r.x, r.y, Lp, r.y, col); dash(ctx, r.x, r.y + r.h, Lp, r.y + r.h, col); });
-        ctx.fillStyle = "#5ad1e8"; ctx.fillRect(Lp - 22, A2.y, 7, A2.h);
-        ctx.fillStyle = "#9be88f"; ctx.fillRect(Lp - 34, B2.y, 7, B2.h);
-        const oyT = Math.max(A2.y, B2.y), oyB = Math.min(A2.y + A2.h, B2.y + B2.h); if (oyB > oyT) { ctx.fillStyle = "rgba(255,209,102,0.9)"; ctx.fillRect(Lp - 28, oyT, 6, oyB - oyT); }
-        const lamp = el("[data-blamp]"); if (lamp) {
-          if ((st.ridx || 0) < (typeof RSTEPS !== "undefined" ? RSTEPS.length : 0)) { const xo = tX(), yo = tY(); lamp.innerHTML = `<span style="color:#5ad1e8">x-overlap: <b>${xo ? "yes" : "no"}</b></span><span style="color:#3f4762"> &nbsp;·&nbsp; </span><span style="color:#9be88f">y-overlap: <b>${yo ? "yes" : "no"}</b></span>`; }
-          else { const r = tX() && tY(); lamp.innerHTML = `<span style="color:#7a8099">A.colliderect(B) →</span> <b style="color:${r ? "#ff6e6e" : "#9be88f"}">${r ? "True · overlap" : "False · apart"}</b>`; }
-        }
-      }
-      function frame() { if (st.phase === "rect") draw2d(); else draw1d(); requestAnimationFrame(frame); }
-      renderUI(); frame();
-    }
-
     function initBuilder3(c) {
       const ctx = c.getContext("2d"); const sec = c.closest("[data-section]");
       const el = (s) => sec.querySelector(s);
@@ -1077,6 +729,16 @@ while True:
         if (st.phase === "done1d" || (st.phase === "build" && allFilled())) { cEl.innerHTML = `<span style="color:#5a6378"># the 1-D line test</span>\n${kIf} ( ${X} ):\n    overlap = ${kT}`; return; }
         cEl.innerHTML = '<span style="color:#6a7290"># it assembles above, piece by piece…</span>';
       }
+      // Randomize answer order so the correct option isn't always first.
+      // Cache by question key so re-renders of the same step keep their order.
+      const _shufOrder = {};
+      function shuffled(arr, key) {
+        if (key && _shufOrder[key]) return _shufOrder[key].map((i) => arr[i]);
+        const idx = arr.map((_, i) => i);
+        for (let i = idx.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+        if (key) _shufOrder[key] = idx;
+        return idx.map((i) => arr[i]);
+      }
       function renderUI() {
         const stepEl = el("[data-bstep]"), optsEl = el("[data-bopts]"), feedEl = el("[data-bfeed]"), nextEl = el("[data-bnext]"), slotsEl = el("[data-bslots]");
         feedEl.innerHTML = ""; nextEl.style.display = "none"; optsEl.innerHTML = "";
@@ -1101,11 +763,11 @@ while True:
           slotsEl.style.display = ""; slotsEl.innerHTML = slotPanel();
           const step = STEPS[st.idx];
           stepEl.innerHTML = step.q;
-          step.opts.forEach((o) => {
+          const wide = step.opts.some((o) => o.t.length > 6);
+          shuffled(step.opts, step.key).forEach((o) => {
             const b = document.createElement("button");
             b.textContent = o.t;
-            const wide = o.t.length > 6;
-            b.style.cssText = `display:${wide ? "block" : "inline-block"};${wide ? "width:100%;text-align:left;" : "min-width:92px;text-align:center;"}margin:0 8px 8px 0;padding:11px 14px;background:#0c1018;border:2px solid #232a3d;color:#e6ebf7;font-family:'JetBrains Mono',monospace;font-size:${wide ? "12.5px" : "15px"};font-weight:700;cursor:pointer;`;
+            b.style.cssText = `display:${wide ? "block" : "inline-block"};${wide ? "width:100%;text-align:left;" : "min-width:120px;text-align:center;"}margin:0 8px 8px 0;padding:12px 14px;background:#0c1018;border:2px solid #232a3d;color:#e6ebf7;font-family:'JetBrains Mono',monospace;font-size:${wide ? "12.5px" : "15px"};font-weight:700;cursor:pointer;min-height:48px;box-sizing:border-box;vertical-align:top;`;
             b.onclick = () => {
               if (o.ok) {
                 if (step.kind === "slot") { vals[step.key] = o.t; slotsEl.innerHTML = slotPanel(); }
@@ -1131,11 +793,11 @@ while True:
             if (wrap) wrap.style.display = "none";
             const step = RSTEPS[st.ridx];
             stepEl.innerHTML = step.q;
-            step.opts.forEach((o) => {
+              const wide = step.opts.some((o) => o.t.length > 6);
+              shuffled(step.opts, "r" + st.ridx).forEach((o) => {
               const b = document.createElement("button");
               b.textContent = o.t;
-              const wide = o.t.length > 6;
-              b.style.cssText = `display:${wide ? "block" : "inline-block"};${wide ? "width:100%;text-align:left;" : "min-width:92px;text-align:center;"}margin:0 8px 8px 0;padding:11px 14px;background:#0c1018;border:2px solid #232a3d;color:#e6ebf7;font-family:'JetBrains Mono',monospace;font-size:${wide ? "12.5px" : "15px"};font-weight:700;cursor:pointer;`;
+              b.style.cssText = `display:${wide ? "block" : "inline-block"};${wide ? "width:100%;text-align:left;" : "min-width:120px;text-align:center;"}margin:0 8px 8px 0;padding:12px 14px;background:#0c1018;border:2px solid #232a3d;color:#e6ebf7;font-family:'JetBrains Mono',monospace;font-size:${wide ? "12.5px" : "15px"};font-weight:700;cursor:pointer;min-height:48px;box-sizing:border-box;vertical-align:top;`;
               b.onclick = () => {
                 if (o.ok) {
                   b.style.borderColor = "#9be88f"; b.style.background = "rgba(110,231,160,0.10)";
@@ -1217,53 +879,37 @@ while True:
     DEMOS["circle-anatomy"] = initCircleAnatomy;
     DEMOS["builder"] = initBuilder;
 
-    // ---- inline live runner: ONE shared backend iframe, embedded under the active section ----
-    // Moving an iframe in the DOM reloads it, so a single element relocates to whichever
-    // section is active — that keeps exactly one Pyodide instance alive at a time.
-    let liveWrap = null, liveKey = null;
-    function ensureLiveWrap() {
-      if (liveWrap) return liveWrap;
-      const wrap = document.createElement("div");
-      wrap.style.cssText = "margin-top:16px; border:2px solid #2f6a44; background:#0a0c16; box-shadow:6px 6px 0 rgba(0,0,0,.45);";
-      const bar = document.createElement("div");
-      bar.style.cssText = "display:flex; align-items:center; gap:10px; background:#11210f; border-bottom:2px solid #2f6a44; padding:8px 12px; flex-wrap:wrap;";
-      const lbl = document.createElement("span");
-      lbl.style.cssText = "font-family:'Press Start 2P',monospace; font-size:8.5px; color:#9be88f; letter-spacing:.5px;";
-      lbl.textContent = "▶ RUNNING THIS SNIPPET";
-      const note = document.createElement("span");
-      note.style.cssText = "font-size:11px; color:#6a7290;";
-      note.textContent = "real pygame · first run loads Python (~15MB, then cached)";
-      const tab = document.createElement("a");
-      tab.target = "_blank"; tab.rel = "noopener";
-      tab.style.cssText = "margin-left:auto; font-size:11px; color:#9be88f; text-decoration:none; border:1px solid #2f6a44; padding:4px 8px;";
-      tab.textContent = "↗ open in tab";
-      const close = document.createElement("button");
-      close.style.cssText = "font-family:'Press Start 2P',monospace; font-size:8px; background:#1a1010; color:#ff8f8f; border:1px solid #5a2f2f; padding:6px 8px; cursor:pointer;";
-      close.textContent = "✕ CLOSE";
-      close.onclick = () => hideLive();
-      bar.append(lbl, note, tab, close);
-      const frame = document.createElement("iframe");
-      frame.title = "pygame runner";
-      frame.setAttribute("allow", "clipboard-write; fullscreen");
-      frame.style.cssText = "width:100%; height:520px; border:0; display:block; background:#0a0c16;";
-      wrap.append(bar, frame);
-      wrap._frame = frame; wrap._tab = tab;
-      liveWrap = wrap;
-      return wrap;
+    // ---- inline live runner: ONE shared backend iframe that REPLACES a section's
+    // static code listing in place. No second editor/canvas copy — "run live" swaps
+    // the static <pre> for the live editor+canvas, and toggles back to show the code.
+    let liveFrame = null, liveKey = null, liveBtn = null, liveHiddenPre = null;
+    function ensureFrame() {
+      if (liveFrame) return liveFrame;
+      const f = document.createElement("iframe");
+      f.title = "pygame runner";
+      f.setAttribute("allow", "clipboard-write; fullscreen");
+      f.style.cssText = "width:100%; height:540px; border:0; border-top:2px solid #1d2233; display:block; background:#0a0c16;";
+      liveFrame = f;
+      return f;
     }
-    function hideLive() {
-      if (!liveWrap) return;
-      if (liveWrap._frame) liveWrap._frame.src = "about:blank";   // tear down Pyodide/audio
-      if (liveWrap.parentNode) liveWrap.parentNode.removeChild(liveWrap);
-      liveKey = null;
+    function stopLive() {
+      if (liveFrame) {
+        liveFrame.src = "about:blank";                 // tear down Pyodide/audio
+        if (liveFrame.parentNode) liveFrame.parentNode.removeChild(liveFrame);
+      }
+      if (liveHiddenPre) liveHiddenPre.style.display = "";   // restore the static listing
+      if (liveBtn) liveBtn.textContent = "▶ RUN LIVE";
+      liveKey = null; liveBtn = null; liveHiddenPre = null;
     }
-    function showLive(key, url, anchorEl) {
-      const wrap = ensureLiveWrap();
-      anchorEl.parentNode.insertBefore(wrap, anchorEl.nextSibling);  // relocating reloads → fresh boot
-      wrap._tab.href = url;
-      wrap._frame.src = url;                                          // #code= auto-loads + auto-runs
-      liveKey = key;
-      wrap.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    function startLive(key, url, pre, btn) {
+      if (liveKey) stopLive();                         // only one live runner at a time
+      const f = ensureFrame();
+      pre.style.display = "none";                      // hide the static code…
+      pre.parentNode.insertBefore(f, pre.nextSibling); // …and take its exact place
+      f.src = url;                                     // #code= auto-loads + auto-runs
+      liveKey = key; liveBtn = btn; liveHiddenPre = pre;
+      btn.textContent = "✕ SHOW CODE";
+      f.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
     // ---- scan: idempotently wire any new demos/code/buttons as the template streams in ----
@@ -1286,13 +932,10 @@ while True:
         btn.addEventListener("click", () => {
           const code = CODE[btn.dataset.run]; if (!code) return;
           const key = btn.dataset.run;
-          if (liveKey === key) { hideLive(); return; }   // same section → toggle closed
+          if (liveKey === key) { stopLive(); return; }   // toggle back to the static code
           const url = RUNNER_URL + "#code=" + b64url(code);
-          const sec = btn.closest("[data-section]");
-          const anchor = sec.querySelector("div[style*='grid-template-columns']") || sec;
-          showLive(key, url, anchor);
-          const o = btn.textContent; btn.textContent = "▶ RUNNING";
-          setTimeout(() => { btn.textContent = o; }, 1400);
+          const pre = btn.closest("[data-section]").querySelector("pre[data-code]");
+          startLive(key, url, pre, btn);
         });
         btn.addEventListener("mouseenter", () => { btn.style.transform = "translate(-1px,-1px)"; btn.style.boxShadow = "3px 3px 0 rgba(0,0,0,.5)"; });
         btn.addEventListener("mouseleave", () => { btn.style.transform = ""; btn.style.boxShadow = "2px 2px 0 rgba(0,0,0,.5)"; });
