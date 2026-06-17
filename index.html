@@ -157,7 +157,7 @@
           <div style="font-size:12.5px; color:#9aa2bb; line-height:1.6; margin-top:12px;"><span style="color:var(--a);">in plain words →</span> if a box is fully left, right, above, or below the other, they miss. If none of those is true, all four checks pass and it's a hit.</div>
         </div>
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; align-items:start;">
-          <div>
+          <div data-viz>
             <div style="background:#0a0b14; border:2px solid #262a3a; padding:6px; line-height:0;"><canvas data-demo="aabb" width="480" height="360" style="width:100%; height:auto; display:block; cursor:none;"></canvas></div>
             <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:#6a7290; margin-top:9px; letter-spacing:.5px;">MOVE THE MOUSE — THE GREEN BOX FOLLOWS</div>
             <div data-status style="margin-top:10px; background:#0c0f1a; border-left:3px solid var(--a); padding:10px 12px; font-size:13.5px; min-height:20px;"></div>
@@ -882,15 +882,16 @@ while True:
     DEMOS["builder"] = initBuilder;
 
     // ---- inline live runner: ONE shared backend iframe that REPLACES a section's
-    // static code listing in place. No second editor/canvas copy — "run live" swaps
-    // the static <pre> for the live editor+canvas, and toggles back to show the code.
-    let liveFrame = null, liveKey = null, liveBtn = null, liveHiddenPre = null;
+    // static visualization (the left [data-viz] cell) in place, leaving the code on
+    // the right. "Run live" swaps the static canvas for the live editor+canvas, and
+    // toggles back to show the visualization.
+    let liveFrame = null, liveKey = null, liveBtn = null, liveHiddenViz = null;
     function ensureFrame() {
       if (liveFrame) return liveFrame;
       const f = document.createElement("iframe");
       f.title = "pygame runner";
       f.setAttribute("allow", "clipboard-write; fullscreen");
-      f.style.cssText = "width:100%; height:540px; border:0; border-top:2px solid #1d2233; display:block; background:#0a0c16;";
+      f.style.cssText = "width:100%; height:540px; border:2px solid #262a3a; display:block; background:#0a0c16; box-sizing:border-box;";
       liveFrame = f;
       return f;
     }
@@ -899,17 +900,17 @@ while True:
         liveFrame.src = "about:blank";                 // tear down Pyodide/audio
         if (liveFrame.parentNode) liveFrame.parentNode.removeChild(liveFrame);
       }
-      if (liveHiddenPre) liveHiddenPre.style.display = "";   // restore the static listing
+      if (liveHiddenViz) liveHiddenViz.style.display = "";   // restore the static visualization
       if (liveBtn) liveBtn.textContent = "▶ RUN LIVE";
-      liveKey = null; liveBtn = null; liveHiddenPre = null;
+      liveKey = null; liveBtn = null; liveHiddenViz = null;
     }
-    function startLive(key, url, pre, btn) {
+    function startLive(key, url, viz, btn) {
       if (liveKey) stopLive();                         // only one live runner at a time
       const f = ensureFrame();
-      pre.style.display = "none";                      // hide the static code…
-      pre.parentNode.insertBefore(f, pre.nextSibling); // …and take its exact place
+      viz.style.display = "none";                      // hide the static visualization…
+      viz.parentNode.insertBefore(f, viz);             // …and take its place (the left cell)
       f.src = url;                                     // #code= auto-loads + auto-runs
-      liveKey = key; liveBtn = btn; liveHiddenPre = pre;
+      liveKey = key; liveBtn = btn; liveHiddenViz = viz;
       btn.textContent = "✕ SHOW CODE";
       f.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
@@ -934,10 +935,10 @@ while True:
         btn.addEventListener("click", () => {
           const code = CODE[btn.dataset.run]; if (!code) return;
           const key = btn.dataset.run;
-          if (liveKey === key) { stopLive(); return; }   // toggle back to the static code
+          if (liveKey === key) { stopLive(); return; }   // toggle back to the static visualization
           const url = RUNNER_URL + "#code=" + b64url(code);
-          const pre = btn.closest("[data-section]").querySelector("pre[data-code]");
-          startLive(key, url, pre, btn);
+          const viz = btn.closest("[data-section]").querySelector("[data-viz]");
+          startLive(key, url, viz, btn);
         });
         btn.addEventListener("mouseenter", () => { btn.style.transform = "translate(-1px,-1px)"; btn.style.boxShadow = "3px 3px 0 rgba(0,0,0,.5)"; });
         btn.addEventListener("mouseleave", () => { btn.style.transform = ""; btn.style.boxShadow = "2px 2px 0 rgba(0,0,0,.5)"; });
